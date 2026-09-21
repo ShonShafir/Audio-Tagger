@@ -22,3 +22,7 @@ Thumbs.db
 venv/
 env/
 .env/
+
+get-pip.py
+PortableAudioTagger/
+Output/

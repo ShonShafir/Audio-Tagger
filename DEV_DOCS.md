@@ -72,16 +72,34 @@ For future agents and developers contributing to this codebase, please adhere to
 
 ## Building the Executable (Windows)
 
-To compile the application into a standalone Windows executable:
+To completely avoid Windows Defender false positives that plague PyInstaller, this project is packaged using an official, standalone Portable Python environment.
+
+To compile the application into a standalone Windows installer:
 
 ```powershell
-# 1. Clear previous builds
-Remove-Item -Recurse -Force build, dist, AudioTagger.spec -ErrorAction SilentlyContinue
+# 1. Download and build the Portable Python environment
+mkdir PortableAudioTagger
+cd PortableAudioTagger
+Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip" -OutFile "python-embed.zip"
+Expand-Archive -Path "python-embed.zip" -DestinationPath "."
+rm "python-embed.zip"
 
-# 2. Build with PyInstaller
-pyinstaller --name "AudioTagger" --windowed --noconfirm --icon="app_icon.ico" --noupx --version-file="version_info.txt" --add-data "core;core" --add-data "app_icon.ico;." app.py
+# 2. Enable site-packages and install dependencies
+(Get-Content "python311._pth") -replace "#import site", "import site" | Set-Content "python311._pth"
+Copy-Item "..\get-pip.py" -Destination "."
+.\python.exe get-pip.py
+.\python.exe -m pip install PyQt6 mutagen requests
 
-# 3. Create Installer (requires Inno Setup CLI)
+# 3. Copy source files into the portable environment
+Copy-Item "..\app.py" -Destination "."
+Copy-Item "..\app_icon.ico" -Destination "."
+Copy-Item -Path "..\core" -Destination "core" -Recurse
+
+# 4. Create the execution shortcut script
+Set-Content -Path "Run Audio Tagger.vbs" -Value "CreateObject(`"WScript.Shell`").Run `"pythonw.exe app.py`", 0, False"
+cd ..
+
+# 5. Create the Installer (requires Inno Setup CLI)
 ISCC.exe setup.iss
 ```
 

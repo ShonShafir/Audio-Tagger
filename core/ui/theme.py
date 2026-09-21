@@ -175,6 +175,7 @@ def build_stylesheet(p: dict) -> str:
     }}
     QTableWidget::item {{
         border-right: 1px solid {d['border']};
+        border-bottom: 1px solid {d['border']};
         padding: 2px;
     }}
     QHeaderView::section {{

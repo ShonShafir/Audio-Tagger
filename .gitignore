@@ -1,0 +1,24 @@
+# User Configuration & Secrets
+config.json
+
+# Compiled binaries and PyInstaller outputs
+build/
+dist/
+*.spec
+Output/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Virtual Environments
+venv/
+env/
+.env/

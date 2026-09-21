@@ -1,0 +1,12 @@
+1. שניתן למרקר הכל
+2. לשנות צבע לhighlight כללי ולhighlight של קבצים עם אותו שם
+3. אופציה לrollback אחרי apply tags & rename
+4. להוסיף תמיכה בעוד סוגי קבצי אודיו
+5. להוסיף תמיכה בעוד sources (spotify וכו)
+6. אפשרות לauto-save
+7. המלצות כלליות לשימוש בtransform וכו בhelp
+8. zoom in, zoom out להכל בכל הכרטיסיות
+9. אפשרות לעדכון גרסה אוטומטי
+10. הוספת link לsource שממנו המידע נלקח אם זה discogs 'וכו
+11. ליצור אתר לתוכנה ולהוסיף שם donnate
+12. microsoft store

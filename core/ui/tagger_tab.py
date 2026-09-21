@@ -82,7 +82,9 @@ class TaggerTabMixin:
 
         self.discogs_btn = QPushButton("Fetch Discogs")
         self.discogs_btn.setEnabled(False)
-        self.discogs_btn.setToolTip("Look up each track on Discogs  (Ctrl+D)")
+        self.discogs_btn.setToolTip("Look up each track on Discogs (Right-click to configure) (Ctrl+D)")
+        self.discogs_btn.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.discogs_btn.customContextMenuRequested.connect(self._show_discogs_menu)
         self.discogs_btn.clicked.connect(self.run_discogs)
 
         self.col_btn = QPushButton("Columns")
@@ -560,6 +562,13 @@ class TaggerTabMixin:
             return
         name = os.path.splitext(rd.get("original", os.path.basename(path)))[0]
         self.player_bar.load(path, name)
+
+    def _show_discogs_menu(self, pos):
+        from PyQt6.QtWidgets import QMenu
+        menu = QMenu(self)
+        action = menu.addAction("Configure Fallbacks / Priorities...")
+        if menu.exec(self.discogs_btn.mapToGlobal(pos)) == action:
+            self.settings_tab._edit_discogs_fallbacks()
 
     # ── Context menu ──────────────────────────────────────────────────────────
 

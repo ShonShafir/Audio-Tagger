@@ -20,6 +20,7 @@ import re
 import glob
 import traceback
 import time
+import copy
 
 from PyQt6.QtCore import QThread, pyqtSignal
 
@@ -161,13 +162,27 @@ class ScanWorker(QThread):
                     "album":      "",
                 }
 
-                # Apply static values and field transforms
+                # Create a temporary row dict to evaluate templates against
+                temp_row = {"fields": fv, "fields_orig": copy.deepcopy(fv), "proposed": "", "original": os.path.basename(path)}
+                
+                # Apply fallbacks, templates, and static values (skipping discogs)
+                from core.evaluate import get_field_value
                 for field in cfg.get("fields", DEFAULT_FIELDS):
-                    if field["source"] in ("static", "both") and field.get("static_value"):
-                        fv[field["id"]] = field["static_value"]
+                    src = field.get("source", "parsed")
+                    # If it's purely parsed or discogs-only, skip (we don't have discogs data yet, and parsed is already in fv)
+                    if src == "parsed" or src == "discogs":
+                        pass
+                    else:
+                        new_val = get_field_value(field, temp_row, allow_discogs=False)
+                        if new_val:
+                            fv[field["id"]] = new_val
+                            temp_row["fields"][field["id"]] = new_val
+                    
+                    # Always apply transforms
                     xform = field.get("transform", "")
                     if xform and field["id"] in fv and fv[field["id"]]:
                         fv[field["id"]] = apply_transform(fv[field["id"]], xform)
+                        temp_row["fields"][field["id"]] = fv[field["id"]]
 
                 # ── Merge with existing row (respects locked and targeted columns) ──
                 existing_cover = b""
@@ -212,6 +227,7 @@ class ScanWorker(QThread):
                     "original":   os.path.basename(path),
                     "proposed":   proposed,
                     "fields":     fv,
+                    "fields_orig":copy.deepcopy(fv),
                     "enabled":    enabled,
                     "cover_data": existing_cover,
                 })
@@ -308,15 +324,17 @@ class DiscogsWorker(QThread):
                     continue
 
                 if catno not in cache_rel:
-                    artist      = row["fields"].get("artist", "")
-                    title       = row["fields"].get("title",  "")
-                    # Keep only the lead artist (drop "A ft. B", "A and B", etc.)
-                    lead_artist = re.split(
-                        r"\s+(?:and|&|ft\.?|feat\.?|vs\.?|with)\s+",
-                        artist, flags=re.IGNORECASE,
-                    )[0].strip()
-                    # Strip parenthetical qualifiers from the title
-                    clean_title = re.sub(r"\s*\(.*?\)", "", title).strip()
+                    from core.evaluate import build_template_context, evaluate_template
+                    ctx = build_template_context(row)
+                    fallbacks = cfg.get("discogs_fallbacks", ["{catno} {artist} {title}", "{catno} {artist}", "{catno}"])
+                    
+                    results = None
+                    for fb in fallbacks:
+                        query = evaluate_template(fb, ctx).strip()
+                        if query:
+                            results = client.search_release(query)
+                            if results:
+                                break
 
                     def _norm(s):
                         return re.sub(r"[-\s]", "", (s or "")).upper()
@@ -324,6 +342,8 @@ class DiscogsWorker(QThread):
                     def _best_match(candidates):
                         """Rank by: exact catno match first, then artist-word overlap."""
                         norm_exp   = _norm(catno)
+                        artist = row["fields"].get("artist", "")
+                        lead_artist = re.split(r"\s+(?:and|&|ft\.?|feat\.?|vs\.?|with)\s+", artist, flags=re.IGNORECASE)[0].strip()
                         lead_words = set(re.sub(r"[^a-z0-9 ]", "", lead_artist.lower()).split())
                         scored = []
                         for r in candidates:
@@ -333,15 +353,6 @@ class DiscogsWorker(QThread):
                             scored.append((catno_ok, artist_score, r))
                         scored.sort(key=lambda x: (x[0], x[1]), reverse=True)
                         return scored[0][2] if scored else None
-
-                    # Four-tier search
-                    results = client.search_release(f"{catno} {lead_artist} {clean_title}".strip())
-                    if not results:
-                        results = client.search_release(f"{catno} {lead_artist}".strip())
-                    if not results and lead_artist:
-                        results = client.search_release(f"{catno} {lead_artist.split()[0]}".strip())
-                    if not results:
-                        results = client.search_release(catno)
 
                     best = _best_match(results) if results else None
                     if best:
@@ -387,21 +398,38 @@ class DiscogsWorker(QThread):
                     cover = row.get("cover_data", b"")
                     
                 if not release:
-                    continue
+                    # Even if no release, we still need to evaluate templates in case they rely on other fields
+                    release = None
 
                 new_fv = dict(row["fields"])
+                temp_row = {"fields": new_fv, "fields_orig": row.get("fields_orig", {}), 
+                            "proposed": row.get("proposed", ""), "original": row.get("original", "")}
+
+                from core.evaluate import get_field_value
                 for field in fields:
                     if row_allowed is not None and field["id"] not in row_allowed:
                         continue
-                    src = field["source"]
-                    if src in ("discogs", "both") and field.get("discogs_field"):
-                        val = resolve_discogs_value(release, field["discogs_field"])
-                        if val:
-                            xform = field.get("transform", "")
-                            if xform:
-                                val = apply_transform(val, xform)
-                            if src == "discogs" or (src == "both" and not new_fv.get(field["id"])):
-                                new_fv[field["id"]] = val
+                        
+                    src = field.get("source", "parsed")
+                    
+                    # DiscogsWorker only evaluates fields that might change from Discogs or Templates
+                    # If it's parsed or static, we skip it because it was already set during ScanWorker.
+                    if src == "parsed" or src == "static":
+                        continue
+                        
+                    new_val = get_field_value(field, temp_row, discogs_data=release, allow_discogs=True)
+                    if new_val:
+                        # Only overwrite if new_val was successfully fetched. 
+                        # E.g. if Discogs fetch failed, we don't want to wipe out manual edits!
+                        new_fv[field["id"]] = new_val
+                        temp_row["fields"][field["id"]] = new_val
+                        
+                    # Re-apply transforms if it changed
+                    if new_val:
+                        xform = field.get("transform", "")
+                        if xform:
+                            new_fv[field["id"]] = apply_transform(new_fv[field["id"]], xform)
+                            temp_row["fields"][field["id"]] = new_fv[field["id"]]
 
                 tmpl     = cfg.get("naming_template", "({catno}) {artist} - {title}.mp3")
                 proposed = build_proposed_filename(

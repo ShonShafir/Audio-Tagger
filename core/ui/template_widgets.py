@@ -2,8 +2,22 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QListWidget, QListWidgetItem,
     QLabel, QPushButton, QAbstractItemView, QMenu, QSplitter
 )
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal, QMimeData
 from PyQt6.QtGui import QAction
+
+class TokenListWidget(QListWidget):
+    def mimeData(self, items):
+        mime = QMimeData()
+        if items:
+            mime.setText(items[0].data(Qt.ItemDataRole.UserRole))
+        return mime
+
+class ReorderListWidget(QListWidget):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setDragDropMode(QAbstractItemView.DragDropMode.InternalMove)
+        self.setDefaultDropAction(Qt.DropAction.MoveAction)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
 class TemplateBuilderWidget(QWidget):
     """
@@ -24,7 +38,7 @@ class TemplateBuilderWidget(QWidget):
         
         # Tokens
         layout.addWidget(QLabel("Available Tokens (Drag into the text box):"))
-        self.token_list = QListWidget()
+        self.token_list = TokenListWidget()
         self.token_list.setDragEnabled(True)
         self.token_list.setDefaultDropAction(Qt.DropAction.CopyAction)
         self.token_list.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
@@ -63,8 +77,7 @@ class SourceFallbackWidget(QWidget):
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         
-        self.list_widget = QListWidget()
-        self.list_widget.setDragDropMode(QAbstractItemView.DragDropMode.InternalMove)
+        self.list_widget = ReorderListWidget()
         
         # Populate
         added = set()
@@ -106,7 +119,7 @@ class DiscogsFallbackListWidget(QWidget):
         top_layout = QVBoxLayout(top_widget)
         top_layout.setContentsMargins(0, 0, 0, 0)
         
-        self.list_widget = QListWidget()
+        self.list_widget = ReorderListWidget()
         for fb in fallbacks:
             self.list_widget.addItem(QListWidgetItem(fb))
             

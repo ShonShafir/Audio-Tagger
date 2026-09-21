@@ -35,7 +35,7 @@ _LEGACY_CONFIG_PATH = os.path.join(
 )
 
 # Sources a field value can come from
-FIELD_SOURCES = ["parsed", "static", "discogs", "both", "template", "fallback"]
+FIELD_SOURCES = ["parsed", "static", "discogs", "template", "fallback"]
 
 # Columns that are always present and cannot be hidden by the user
 FIXED_COLS = ["Check", "Cover", "Original File", "Proposed Filename"]

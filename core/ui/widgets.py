@@ -137,7 +137,6 @@ class CoverViewDialog(QDialog):
         lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
         lbl.setCursor(Qt.CursorShape.PointingHandCursor)
         lbl.setToolTip("Click to close")
-        lbl.mousePressEvent = lambda _e: self.close()
         layout.addWidget(lbl)
 
         info = QLabel(
@@ -149,6 +148,9 @@ class CoverViewDialog(QDialog):
         info.setStyleSheet("color:#6c7086; font-size:11px;")
         layout.addWidget(info)
         self.adjustSize()
+
+    def mousePressEvent(self, event):
+        self.accept()
 
 
 # ─────────────────────────────────────────────────────────────────────────────

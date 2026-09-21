@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Tagger - The Ultimate Bulk Audio Tagging Tool</title>
+    <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+    <style>
+        /* Custom glow effects for modern feel */
+        .glow {
+            box-shadow: 0 0 40px -10px rgba(59, 130, 246, 0.5);
+        }
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-300 font-sans antialiased">
+
+    <!-- Navigation -->
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center border-b border-slate-800">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/30">AT</div>
+            <span class="text-xl font-bold text-slate-100 tracking-tight">Audio Tagger</span>
+        </div>
+        <div class="flex gap-6 items-center">
+            <a href="#" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'}); return false;" class="text-sm font-medium hover:text-white transition">Features</a>
+            <a href="#" onclick="document.getElementById('download').scrollIntoView({behavior: 'smooth'}); return false;" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-full text-sm font-semibold transition border border-slate-700">Download</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="text-center px-6 py-20 relative overflow-hidden">
+        <!-- Background decorative blob -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-blue-600/20 blur-[120px] rounded-full pointer-events-none"></div>
+
+        <div class="relative z-10 max-w-4xl mx-auto">
+            <span class="px-3 py-1 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-400 text-sm font-medium mb-6 inline-block">
+                Version 1.0.0 Now Available
+            </span>
+            <h1 class="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-8 leading-tight">
+                Tag your music library <br />
+                <span class="bg-gradient-to-r from-blue-400 to-indigo-500 text-gradient">in seconds.</span>
+            </h1>
+            <p class="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                A powerful, spreadsheet-style audio tagger designed specifically for DJs and electronic music collectors. Smart parsing, automated Discogs fetching, and seamless bulk renaming.
+            </p>
+            
+            <div id="download" class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="https://github.com/ShonShafir/Audio-Tagger/releases/latest/download/AudioTagger_Setup.exe" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold text-lg transition flex items-center gap-3 glow">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download for Windows
+                </a>
+                <span class="text-sm text-slate-500">Requires Windows 10/11 (64-bit)</span>
+            </div>
+        </div>
+
+        <!-- App Preview Mockup (Hyper-Accurate Replica) -->
+        <div class="mt-16 w-full max-w-6xl mx-auto relative z-10 text-left">
+            <div class="rounded-xl border border-slate-700/50 bg-[#2b2d3c] shadow-2xl overflow-hidden flex flex-col font-sans text-sm">
+                
+                <!-- Tabs -->
+                <div class="flex bg-[#1e1f2b] pt-2 px-2 gap-0.5 select-none border-b border-[#3c3f58]">
+                    <div class="bg-[#2b2d3c] text-[#e0e2eb] px-5 py-1.5 rounded-t font-medium text-xs">Tagger</div>
+                    <div class="text-[#a0a5b8] hover:bg-[#2b2d3c]/50 px-5 py-1.5 rounded-t cursor-pointer transition-colors text-xs">Settings</div>
+                    <div class="text-[#a0a5b8] hover:bg-[#2b2d3c]/50 px-5 py-1.5 rounded-t cursor-pointer transition-colors text-xs">Help</div>
+                </div>
+
+                <!-- App Body -->
+                <div class="p-3 flex flex-col gap-3 bg-[#2b2d3c]">
+                    
+                    <!-- Toolbar 1 -->
+                    <div class="flex items-center gap-2">
+                        <!-- Select Folder -->
+                        <div class="relative group">
+                            <button class="bg-[#a3c2f3] hover:bg-[#a3c2f3]/90 text-[#1a1b26] font-bold text-xs px-3 py-1.5 rounded shadow-sm cursor-help">Select Folder</button>
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 p-3 bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center font-normal">
+                                <strong class="text-white block mb-1">Select Folder</strong>
+                                Choose the directory containing your messy MP3s and M3U playlists.
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Path -->
+                        <span class="text-[#8cdb93] text-xs font-mono ml-1 mr-auto relative group cursor-help">
+                            C:/Music/To Sort
+                            <div class="absolute bottom-full left-0 mb-2 w-56 p-3 bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center font-normal">
+                                Displays your currently selected directory.
+                                <div class="absolute top-full left-4 border-4 border-transparent border-t-slate-800"></div>
+                            </div>
+                        </span>
+
+                        <!-- Re-scan -->
+                        <div class="relative group">
+                            <button class="bg-[#a3c2f3] hover:bg-[#a3c2f3]/90 text-[#1a1b26] font-bold text-xs px-3 py-1.5 rounded shadow-sm cursor-help flex items-center gap-1">
+                                <span>↺</span> Re-scan
+                            </button>
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center font-normal">
+                                <strong class="text-white block mb-1">Regex Parsing Engine</strong>
+                                Automatically parses filenames using Regex. If specific cells are highlighted, it only re-scans those!
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                            </div>
+                        </div>
+
+                        <!-- Fetch Discogs -->
+                        <div class="relative group">
+                            <button class="bg-[#a3c2f3] hover:bg-[#a3c2f3]/90 text-[#1a1b26] font-bold text-xs px-3 py-1.5 rounded shadow-sm cursor-help">Fetch Discogs</button>
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center font-normal">
+                                <strong class="text-white block mb-1">Discogs API Integration</strong>
+                                Connects to Discogs using your Catalog Numbers to download release dates, genres, labels, and cover art.
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                            </div>
+                        </div>
+
+                        <!-- Utility Buttons -->
+                        <button class="bg-[#a3c2f3] hover:bg-[#a3c2f3]/90 text-[#1a1b26] font-bold text-xs px-3 py-1.5 rounded shadow-sm">Columns</button>
+                        <button class="bg-[#a3c2f3] hover:bg-[#a3c2f3]/90 text-[#1a1b26] font-bold text-xs px-3 py-1.5 rounded shadow-sm">Find Replace</button>
+                        
+                        <!-- Apply Tags -->
+                        <div class="relative group">
+                            <button class="bg-[#a3c2f3] hover:bg-[#a3c2f3]/90 text-[#1a1b26] font-bold text-xs px-3 py-1.5 rounded shadow-sm cursor-help">Apply Tags and Rename</button>
+                            <div class="absolute bottom-full right-0 mb-2 w-64 p-3 bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center font-normal">
+                                <strong class="text-white block mb-1">Write to Files</strong>
+                                Embeds all ID3 tags, attaches the Cover Art, and renames the physical files on your hard drive.
+                                <div class="absolute top-full right-6 border-4 border-transparent border-t-slate-800"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pills -->
+                    <div class="flex flex-wrap items-center gap-2 text-xs relative group cursor-help">
+                        <span class="font-bold text-white mr-1">Columns:</span>
+                        <div class="border border-[#4c4e67] text-[#c9ccdd] bg-[#222330] rounded-full px-3 py-0.5 hover:bg-[#323447] cursor-pointer transition">Type</div>
+                        <div class="border border-[#4c4e67] text-[#c9ccdd] bg-[#222330] rounded-full px-3 py-0.5 hover:bg-[#323447] cursor-pointer transition">Artist</div>
+                        <div class="border border-[#4c4e67] text-[#c9ccdd] bg-[#222330] rounded-full px-3 py-0.5 hover:bg-[#323447] cursor-pointer transition">Featured Artist</div>
+                        <div class="border border-[#4c4e67] text-[#c9ccdd] bg-[#222330] rounded-full px-3 py-0.5 hover:bg-[#323447] cursor-pointer transition">Title</div>
+                        <div class="border border-[#4c4e67] text-[#c9ccdd] bg-[#222330] rounded-full px-3 py-0.5 hover:bg-[#323447] cursor-pointer transition">Remixer</div>
+                        <div class="border border-[#4c4e67] text-[#c9ccdd] bg-[#222330] rounded-full px-3 py-0.5 hover:bg-[#323447] cursor-pointer transition">CatNo</div>
+                        <div class="border border-[#4c4e67] text-[#c9ccdd] bg-[#222330] rounded-full px-3 py-0.5 hover:bg-[#323447] cursor-pointer transition">Date</div>
+                        <div class="border border-[#4c4e67] text-[#c9ccdd] bg-[#222330] rounded-full px-3 py-0.5 hover:bg-[#323447] cursor-pointer transition">Style</div>
+                        <div class="border border-[#4c4e67] text-[#c9ccdd] bg-[#222330] rounded-full px-3 py-0.5 hover:bg-[#323447] cursor-pointer transition">Country</div>
+                        <div class="border border-[#4c4e67] text-[#c9ccdd] bg-[#222330] rounded-full px-3 py-0.5 hover:bg-[#323447] cursor-pointer transition">Genre</div>
+                        <div class="border border-[#4c4e67] text-[#c9ccdd] bg-[#222330] rounded-full px-3 py-0.5 hover:bg-[#323447] cursor-pointer transition">Label</div>
+                        <div class="border border-[#4c4e67] text-[#c9ccdd] bg-[#222330] rounded-full px-3 py-0.5 hover:bg-[#323447] cursor-pointer transition">Album</div>
+                        
+                        <div class="absolute bottom-full left-1/4 mb-2 w-64 p-3 bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center font-normal">
+                            <strong class="text-white block mb-1">Dynamic View Toggles</strong>
+                            Click these chips to instantly show or hide columns in the grid. Keeps your workspace focused.
+                            <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="bg-[#1b1d28] flex flex-col border border-[#3e4157] rounded-sm overflow-x-auto relative group">
+                        
+                        <div class="absolute left-1/2 -translate-x-1/2 top-10 w-64 p-3 bg-slate-800 border border-slate-700 text-white text-xs rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center font-normal">
+                            <strong class="block mb-1 text-blue-400">Spreadsheet Editor</strong>
+                            Double-click any cell to manually edit text. Right-click to search Discogs manually. Double-click rows to preview audio!
+                        </div>
+
+                        <!-- Headers -->
+                        <div class="flex text-xs font-bold text-white bg-[#222432] border-b border-[#3e4157] min-w-max items-center h-8">
+                            <div class="w-10 border-r border-[#3e4157] h-full"></div> <!-- Row Header Space -->
+                            <div class="w-16 h-full flex items-center justify-center border-r border-[#3e4157]">Check</div>
+                            <div class="w-16 h-full flex items-center justify-center border-r border-[#3e4157]">Cover</div>
+                            <div class="w-64 h-full flex items-center justify-center border-r border-[#3e4157]">Original File</div>
+                            <div class="w-64 h-full flex items-center justify-center border-r border-[#3e4157]">Proposed Filename</div>
+                            <div class="w-32 h-full flex items-center justify-center border-r border-[#3e4157]">Artist</div>
+                            <div class="w-32 h-full flex items-center justify-center border-r border-[#3e4157]">Featured Artist</div>
+                            <div class="w-48 h-full flex items-center justify-center border-r border-[#3e4157]">Title</div>
+                            <div class="w-32 h-full flex items-center justify-center border-r border-[#3e4157]">Remixer</div>
+                            <div class="w-24 h-full flex items-center justify-center border-r border-[#3e4157]">CatNo</div>
+                            <div class="w-24 h-full flex items-center justify-center border-r border-[#3e4157]">Date</div>
+                            <div class="w-32 h-full flex items-center justify-center">Style</div>
+                        </div>
+                        
+                        <!-- Empty Rows (1 to 5) -->
+                        <!-- Row 1 -->
+                        <div class="flex text-[11px] text-[#b3b9ce] border-b border-[#3e4157]/40 min-w-max bg-[#1b1d28] items-center h-8 hover:bg-[#3daee9]/10 transition-colors">
+                            <div class="w-10 h-full border-r border-[#3e4157] flex items-center justify-center font-bold text-white bg-[#222432]">1 <span class="text-[8px] text-[#6b7280] ml-1">v</span></div>
+                            <div class="w-16 h-full border-r border-[#3e4157]/50 flex items-center justify-center"><input type="checkbox" class="opacity-50 pointer-events-none" checked></div>
+                            <div class="w-16 h-full border-r border-[#3e4157]/50 flex items-center justify-center text-[#4b5563]">--</div>
+                            <div class="w-64 h-full border-r border-[#3e4157]/50 px-2 flex items-center italic text-[#6b7280]">Awaiting scan...</div>
+                            <div class="w-64 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-48 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-24 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-24 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full px-2 flex items-center"></div>
+                        </div>
+                        
+                        <!-- Row 2 (Alternate) -->
+                        <div class="flex text-[11px] text-[#b3b9ce] border-b border-[#3e4157]/40 min-w-max bg-[#1f212e] items-center h-8 hover:bg-[#3daee9]/10 transition-colors">
+                            <div class="w-10 h-full border-r border-[#3e4157] flex items-center justify-center font-bold text-white bg-[#222432]">2 <span class="text-[8px] text-[#6b7280] ml-1">v</span></div>
+                            <div class="w-16 h-full border-r border-[#3e4157]/50 flex items-center justify-center"><input type="checkbox" class="opacity-50 pointer-events-none" checked></div>
+                            <div class="w-16 h-full border-r border-[#3e4157]/50 flex items-center justify-center text-[#4b5563]">--</div>
+                            <div class="w-64 h-full border-r border-[#3e4157]/50 px-2 flex items-center italic text-[#6b7280]">Awaiting scan...</div>
+                            <div class="w-64 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-48 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-24 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-24 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full px-2 flex items-center"></div>
+                        </div>
+
+                        <!-- Row 3 -->
+                        <div class="flex text-[11px] text-[#b3b9ce] border-b border-[#3e4157]/40 min-w-max bg-[#1b1d28] items-center h-8 hover:bg-[#3daee9]/10 transition-colors">
+                            <div class="w-10 h-full border-r border-[#3e4157] flex items-center justify-center font-bold text-white bg-[#222432]">3 <span class="text-[8px] text-[#6b7280] ml-1">v</span></div>
+                            <div class="w-16 h-full border-r border-[#3e4157]/50 flex items-center justify-center"><input type="checkbox" class="opacity-50 pointer-events-none" checked></div>
+                            <div class="w-16 h-full border-r border-[#3e4157]/50 flex items-center justify-center text-[#4b5563]">--</div>
+                            <div class="w-64 h-full border-r border-[#3e4157]/50 px-2 flex items-center italic text-[#6b7280]">Awaiting scan...</div>
+                            <div class="w-64 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-48 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-24 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-24 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full px-2 flex items-center"></div>
+                        </div>
+
+                        <!-- Row 4 (Alternate) -->
+                        <div class="flex text-[11px] text-[#b3b9ce] border-b border-[#3e4157]/40 min-w-max bg-[#1f212e] items-center h-8 hover:bg-[#3daee9]/10 transition-colors">
+                            <div class="w-10 h-full border-r border-[#3e4157] flex items-center justify-center font-bold text-white bg-[#222432]">4 <span class="text-[8px] text-[#6b7280] ml-1">v</span></div>
+                            <div class="w-16 h-full border-r border-[#3e4157]/50 flex items-center justify-center"><input type="checkbox" class="opacity-50 pointer-events-none" checked></div>
+                            <div class="w-16 h-full border-r border-[#3e4157]/50 flex items-center justify-center text-[#4b5563]">--</div>
+                            <div class="w-64 h-full border-r border-[#3e4157]/50 px-2 flex items-center italic text-[#6b7280]">Awaiting scan...</div>
+                            <div class="w-64 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-48 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-24 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-24 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full px-2 flex items-center"></div>
+                        </div>
+
+                        <!-- Row 5 -->
+                        <div class="flex text-[11px] text-[#b3b9ce] min-w-max bg-[#1b1d28] items-center h-8 hover:bg-[#3daee9]/10 transition-colors">
+                            <div class="w-10 h-full border-r border-[#3e4157] flex items-center justify-center font-bold text-white bg-[#222432]">5 <span class="text-[8px] text-[#6b7280] ml-1">v</span></div>
+                            <div class="w-16 h-full border-r border-[#3e4157]/50 flex items-center justify-center"><input type="checkbox" class="opacity-50 pointer-events-none" checked></div>
+                            <div class="w-16 h-full border-r border-[#3e4157]/50 flex items-center justify-center text-[#4b5563]">--</div>
+                            <div class="w-64 h-full border-r border-[#3e4157]/50 px-2 flex items-center italic text-[#6b7280]">Awaiting scan...</div>
+                            <div class="w-64 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-48 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-24 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-24 h-full border-r border-[#3e4157]/50 px-2 flex items-center"></div>
+                            <div class="w-32 h-full px-2 flex items-center"></div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Progress Bar -->
+                    <div class="mt-1 flex items-center gap-2">
+                        <div class="flex-grow bg-[#8caaee] text-[#1a1b26] text-[10px] font-bold text-center rounded-sm py-1 relative shadow-sm">
+                            100%
+                        </div>
+                        <button class="bg-[#8caaee] hover:bg-[#8caaee]/80 text-[#1a1b26] px-3 py-1 rounded-sm text-[10px] font-bold flex items-center gap-1 shadow-sm">
+                            <span class="tracking-tighter">||</span> Pause
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 bg-slate-800/30 border-t border-slate-800">
+        <div class="container mx-auto px-6 max-w-6xl">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Built for messy libraries.</h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">Stop editing tags one by one. Audio Tagger gives you the power of a spreadsheet combined with automated metadata retrieval.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Smart Parsing -->
+                <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition">
+                    <h3 class="text-lg font-bold text-white mb-2">🧠 Smart Filename Parsing</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Automatically extracts Artist, Featured Artist, Title, Remixers, and Catalog Numbers from the ugliest filenames.</p>
+                </div>
+                <!-- Discogs -->
+                <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition">
+                    <h3 class="text-lg font-bold text-white mb-2">💿 Discogs Integration</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Fetch high-quality cover art, release dates, labels, genres, and styles directly from the official Discogs API.</p>
+                </div>
+                <!-- Spreadsheet -->
+                <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition">
+                    <h3 class="text-lg font-bold text-white mb-2">📊 Spreadsheet Editor</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Review, edit, and apply tags in bulk. Toggle column visibility instantly using modern pill buttons to keep your workspace clean.</p>
+                </div>
+                <!-- Targeted Cells -->
+                <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition">
+                    <h3 class="text-lg font-bold text-white mb-2">🎯 Targeted Operations</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Highlight specific cells to selectively re-parse filenames or fetch metadata without overwriting your manual edits elsewhere.</p>
+                </div>
+                <!-- Find & Replace -->
+                <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition">
+                    <h3 class="text-lg font-bold text-white mb-2">🔍 Bulk Find & Replace</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Fix recurring typos or update artist names across hundreds of tracks at once with a live preview of the changes.</p>
+                </div>
+                <!-- Duplicate Detection -->
+                <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition">
+                    <h3 class="text-lg font-bold text-white mb-2">⚠️ Duplicate Detection</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Instantly spots identical proposed filenames and highlights them in amber to prevent file overwrite collisions before they happen.</p>
+                </div>
+                <!-- M3U Integration -->
+                <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition">
+                    <h3 class="text-lg font-bold text-white mb-2">📜 M3U Playlist Integration</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Automatically scans `.m3u` files in your directories to assign missing Catalog Numbers to unidentifiable tracks.</p>
+                </div>
+                <!-- Audio Preview -->
+                <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition">
+                    <h3 class="text-lg font-bold text-white mb-2">🎵 Built-in Audio Player</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Double-click any track in the grid to preview the audio instantly using the built-in floating media player.</p>
+                </div>
+                <!-- Customization -->
+                <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition">
+                    <h3 class="text-lg font-bold text-white mb-2">⚙️ Fully Customizable</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Set up your own custom file naming template, configure static fallback values (like Country or Genre), and tailor the app to your workflow.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center text-slate-500 text-sm border-t border-slate-800">
+        <p>&copy; 2026 Shon Shafir. Open source and built with PyQt6.</p>
+    </footer>
+
+</body>
+</html>

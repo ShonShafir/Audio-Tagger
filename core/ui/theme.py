@@ -173,11 +173,17 @@ def build_stylesheet(p: dict) -> str:
         alternate-background-color: {d['bg_surface']};
         color: {d['text_primary']};
     }}
+    QTableWidget::item {{
+        border-right: 1px solid {d['border']};
+        padding: 2px;
+    }}
     QHeaderView::section {{
         background: {d['bg_header']};
         color: {d['text_primary']};
         padding: 6px;
         border: none;
+        border-right: 1px solid {d['border']};
+        border-bottom: 1px solid {d['border']};
         font-weight: bold;
     }}
     QPushButton {{

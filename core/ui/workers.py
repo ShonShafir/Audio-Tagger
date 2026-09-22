@@ -316,14 +316,11 @@ class DiscogsWorker(QThread):
                         return
 
                 catno = row["fields"].get("catno", "")
-                if not catno or catno == "UNKNOWN":
-                    self.progress.emit(
-                        int(100 * (i + 1) / total),
-                        f"Skipped: {os.path.basename(row['path'])}",
-                    )
-                    continue
+                
+                # Determine cache key: group by catno if present, otherwise by the track's path
+                cache_key = catno if (catno and catno != "UNKNOWN") else row["path"]
 
-                if catno not in cache_rel:
+                if cache_key not in cache_rel:
                     from core.evaluate import build_template_context, evaluate_template
                     ctx = build_template_context(row)
                     fallbacks = cfg.get("discogs_fallbacks", ["{catno} {artist} {title}", "{catno} {artist}", "{catno}"])
@@ -362,7 +359,7 @@ class DiscogsWorker(QThread):
                     if best:
                         rel_id = best["id"]
                         full   = client._get(f"https://api.discogs.com/releases/{rel_id}")
-                        cache_rel[catno] = full
+                        cache_rel[cache_key] = full
                         if self.target_cells is None or (row_allowed is not None and "__cover__" in row_allowed):
                             images = full.get("images", [])
                             if images:
@@ -370,7 +367,7 @@ class DiscogsWorker(QThread):
                                     (img for img in images if img.get("type") == "primary"),
                                     images[0],
                                 )
-                                cache_cov[catno] = client.download_image(primary["uri"])
+                                cache_cov[cache_key] = client.download_image(primary["uri"])
                             elif cfg.get("cover_fallback_local", True):
                                 local_art = (
                                     glob.glob(os.path.join(self.folder, "*.png"))
@@ -378,26 +375,26 @@ class DiscogsWorker(QThread):
                                 )
                                 if local_art:
                                     with open(local_art[0], "rb") as f:
-                                        cache_cov[catno] = f.read()
+                                        cache_cov[cache_key] = f.read()
 
-                release = cache_rel.get(catno)
+                release = cache_rel.get(cache_key)
                 
                 # If we need the cover, ensure it's downloaded if not already in cache_cov
                 needs_cover = self.target_cells is None or (row_allowed is not None and "__cover__" in row_allowed)
-                if needs_cover and catno not in cache_cov and release:
+                if needs_cover and cache_key not in cache_cov and release:
                     images = release.get("images", [])
                     if images:
                         primary = next((img for img in images if img.get("type") == "primary"), images[0])
-                        cache_cov[catno] = client.download_image(primary["uri"])
+                        cache_cov[cache_key] = client.download_image(primary["uri"])
                     elif cfg.get("cover_fallback_local", True):
                         local_art = glob.glob(os.path.join(self.folder, "*.png")) + glob.glob(os.path.join(self.folder, "*.jpg"))
                         if local_art:
                             with open(local_art[0], "rb") as f:
-                                cache_cov[catno] = f.read()
+                                cache_cov[cache_key] = f.read()
 
                 # Fetch cover from cache if targeted or global update
                 if needs_cover:
-                    cover = cache_cov.get(catno, row.get("cover_data", b""))
+                    cover = cache_cov.get(cache_key, row.get("cover_data", b""))
                 else:
                     cover = row.get("cover_data", b"")
                     

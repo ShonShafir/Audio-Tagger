@@ -65,11 +65,5 @@ def get_field_value(field_cfg: dict, row: dict, discogs_data: dict = None, allow
             if val:
                 return val
         return ""
-    elif source == "both":
-        # Legacy
-        val = get_from_source("discogs")
-        if not val:
-            val = get_from_source("static")
-        return val
     else:
         return get_from_source(source)

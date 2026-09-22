@@ -332,6 +332,10 @@ class DiscogsWorker(QThread):
                     for fb in fallbacks:
                         query = evaluate_template(fb, ctx).strip()
                         if query:
+                            self.progress.emit(
+                                int(100 * (i + 1) / total),
+                                f"Searching Discogs: '{query}'..."
+                            )
                             results = client.search_release(query)
                             if results:
                                 break

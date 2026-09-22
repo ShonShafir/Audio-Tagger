@@ -48,11 +48,19 @@ def _transform_date(value: str, fmt: str) -> str:
     if not value:
         return ""
 
-    # Try ISO-style split first (yyyy-mm-dd or yyyy-mm or yyyy)
+    # Try splitting by dash/slash
     parts = value.replace("/", "-").split("-")
-    year  = parts[0] if len(parts) >= 1 else "0000"
-    month = parts[1] if len(parts) >= 2 else "00"
-    day   = parts[2] if len(parts) >= 3 else "00"
+    
+    if len(parts) == 3 and len(parts[-1]) == 4 and len(parts[0]) <= 2:
+        # Already DD-MM-YYYY or MM-DD-YYYY formatted
+        day   = parts[0]
+        month = parts[1]
+        year  = parts[2]
+    else:
+        # Assume ISO-style YYYY-MM-DD or YYYY-MM or YYYY
+        year  = parts[0] if len(parts) >= 1 else "0000"
+        month = parts[1] if len(parts) >= 2 else "00"
+        day   = parts[2] if len(parts) >= 3 else "00"
 
     # Fallback: try common full-text date formats
     if not year.isdigit():

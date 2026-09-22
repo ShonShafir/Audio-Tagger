@@ -412,13 +412,20 @@ class DiscogsWorker(QThread):
                         continue
                         
                     src = field.get("source", "parsed")
+                    is_targeted = (row_allowed is not None and field["id"] in row_allowed)
                     
-                    # DiscogsWorker only evaluates fields that might change from Discogs or Templates
-                    # If it's parsed or static, we skip it because it was already set during ScanWorker.
-                    if src == "parsed" or src == "static":
+                    if not is_targeted and (src == "parsed" or src == "static"):
                         continue
                         
-                    new_val = get_field_value(field, temp_row, discogs_data=release, allow_discogs=True)
+                    new_val = ""
+                    if is_targeted and release and field.get("discogs_field"):
+                        from core.transforms import resolve_discogs_value
+                        new_val = resolve_discogs_value(release, field.get("discogs_field"))
+                        
+                    if not new_val:
+                        # Fallback to standard field evaluation
+                        new_val = get_field_value(field, temp_row, discogs_data=release, allow_discogs=True)
+                        
                     if new_val:
                         # Only overwrite if new_val was successfully fetched. 
                         # E.g. if Discogs fetch failed, we don't want to wipe out manual edits!

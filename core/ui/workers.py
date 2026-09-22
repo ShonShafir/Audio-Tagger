@@ -185,8 +185,6 @@ class ScanWorker(QThread):
                 
                 if self.target_paths is not None:
                     row_allowed = self.target_paths[path]
-                    if self.allowed_fields is not None:
-                        row_allowed = row_allowed.intersection(self.allowed_fields)
                 else:
                     row_allowed = self.allowed_fields
 
@@ -407,19 +405,10 @@ class DiscogsWorker(QThread):
                         continue
                         
                     src = field.get("source", "parsed")
-                    is_targeted = (row_allowed is not None and field["id"] in row_allowed)
-                    
-                    if not is_targeted and (src == "parsed" or src == "static"):
+                    if src == "parsed" or src == "static":
                         continue
                         
-                    new_val = ""
-                    if is_targeted and release and field.get("discogs_field"):
-                        from core.transforms import resolve_discogs_value
-                        new_val = resolve_discogs_value(release, field.get("discogs_field"))
-                        
-                    if not new_val:
-                        # Fallback to standard field evaluation
-                        new_val = get_field_value(field, temp_row, discogs_data=release, allow_discogs=True)
+                    new_val = get_field_value(field, temp_row, discogs_data=release, allow_discogs=True)
                         
                     if new_val:
                         # Only overwrite if new_val was successfully fetched. 

@@ -68,11 +68,11 @@ class TemplateBuilderWidget(QWidget):
 class SourceFallbackWidget(QWidget):
     """
     A drag-and-drop list to reorder fallback sources.
-    Available sources: parsed, static, discogs, template.
+    Available sources: parsed, static, discogs.
     """
     def __init__(self, current_order: list):
         super().__init__()
-        self.available_sources = ["discogs", "parsed", "static", "template"]
+        self.available_sources = ["discogs", "parsed", "static"]
         
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)

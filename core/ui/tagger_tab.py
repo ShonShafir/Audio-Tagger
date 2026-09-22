@@ -140,11 +140,14 @@ class TaggerTabMixin:
         self.table.customContextMenuRequested.connect(self._table_context_menu)
         # Double-click a row → play that MP3 in the audio player
         self.table.cellDoubleClicked.connect(self._on_cell_double_clicked)
+        self.table.itemChanged.connect(self._on_item_changed)
         layout.addWidget(self.table)
 
         # ── Audio player bar (hidden until first track is loaded) ─────────────
         self.player_bar = AudioPlayerBar()
         layout.addWidget(self.player_bar)
+
+        self._audio_files = []
 
         # ── Bottom bar: progress + pause ─────────────────────────────────────
         bot = QHBoxLayout()
@@ -285,6 +288,53 @@ class TaggerTabMixin:
         return allowed
 
     # ── Table population ──────────────────────────────────────────────────────
+
+
+    def _on_item_changed(self, item):
+        if not hasattr(self, 'rows') or not self.rows:
+            return
+        row = item.row()
+        col = item.column()
+        if row >= len(self.rows):
+            return
+            
+        field_id = None
+        for f in getattr(self, '_vis_fields', []):
+            if self._col_map.get(f["label"]) == col:
+                field_id = f["id"]
+                break
+                
+        if not field_id:
+            return
+            
+        self.rows[row]["fields"][field_id] = item.text()
+        
+        from core.parser import build_proposed_filename
+        import os
+        cfg = self.settings_tab.get_cfg()
+        tmpl = cfg.get("naming_template", "({catno}) {artist} - {title}.mp3")
+        fv = self.rows[row]["fields"]
+        
+        path = self.rows[row].get("path", "")
+        ext = os.path.splitext(path)[1].lower() if path else ""
+        
+        proposed = build_proposed_filename(
+            tmpl,
+            fv.get("catno", "UNKNOWN"),
+            fv.get("artist", ""),
+            fv.get("featured", ""),
+            fv.get("title", ""),
+            feat_format=cfg.get("feat_format", "ft."),
+            original_ext=ext
+        )
+        
+        prop_col = self._col_map.get("Proposed Filename")
+        if prop_col is not None:
+            prop_item = self.table.item(row, prop_col)
+            if prop_item and prop_item.text() != proposed:
+                self.table.blockSignals(True)
+                prop_item.setText(proposed)
+                self.table.blockSignals(False)
 
     def _update_cover_selection_styles(self):
         """Add a blue highlight border to selected cover cells, since setCellWidget obscures it."""

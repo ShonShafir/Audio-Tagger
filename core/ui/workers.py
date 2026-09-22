@@ -147,7 +147,7 @@ class ScanWorker(QThread):
                 raw_t    = title_case_smart(raw_t)
                 remixer  = title_case_smart(remixer)
 
-                fv = {
+                parsed_fv = {
                     "file_type":  file_type,
                     "artist":     artist,
                     "featured":   featured,
@@ -162,21 +162,16 @@ class ScanWorker(QThread):
                     "album":      "",
                 }
 
-                # Create a temporary row dict to evaluate templates against
-                temp_row = {"fields": fv, "fields_orig": copy.deepcopy(fv), "proposed": "", "original": os.path.basename(path)}
+                temp_row = {"fields": parsed_fv, "fields_orig": copy.deepcopy(parsed_fv), "proposed": "", "original": os.path.basename(path)}
                 
-                # Apply fallbacks, templates, and static values (skipping discogs)
+                fv = {"file_type": file_type}
                 from core.evaluate import get_field_value
                 for field in cfg.get("fields", DEFAULT_FIELDS):
-                    src = field.get("source", "parsed")
-                    # If it's purely parsed or discogs-only, skip (we don't have discogs data yet, and parsed is already in fv)
-                    if src == "parsed" or src == "discogs":
-                        pass
-                    else:
-                        new_val = get_field_value(field, temp_row, allow_discogs=False)
-                        if new_val:
-                            fv[field["id"]] = new_val
-                            temp_row["fields"][field["id"]] = new_val
+                    if field["id"] == "file_type":
+                        continue
+                    new_val = get_field_value(field, temp_row, allow_discogs=False)
+                    fv[field["id"]] = new_val
+                    temp_row["fields"][field["id"]] = new_val
                     
                     # Always apply transforms
                     xform = field.get("transform", "")

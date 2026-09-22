@@ -520,7 +520,20 @@ class ApplyWorker(QThread):
                         if os.path.exists(new_path):
                             self.error.emit(f"Target already exists: {new_path}")
                             return
-                        os.rename(path, new_path)
+                        
+                        # Retry loop for Windows: sometimes the OS (Defender/Indexer) 
+                        # locks the file immediately after we write tags to it.
+                        import time
+                        renamed = False
+                        for att in range(5):
+                            try:
+                                os.rename(path, new_path)
+                                renamed = True
+                                break
+                            except PermissionError:
+                                time.sleep(0.2)
+                        if not renamed:
+                            os.rename(path, new_path) # Final attempt, will raise the error if it still fails
 
             except Exception:
                 self.error.emit(f"Error on {row['original']}:\n{traceback.format_exc()}")

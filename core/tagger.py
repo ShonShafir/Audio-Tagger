@@ -222,6 +222,61 @@ def apply_tags(filepath: str, fv: dict, fields: list,
     else:  # .mp3 default
         _apply_tags_id3(filepath, fv, fields, txxx_descs, cover_data, embed_cover, is_wav=False)
 
+def read_tags(filepath: str, fields: list) -> dict:
+    """Read existing tags from a file (ID3 or FLAC) and return a dict of {field_id: value}."""
+    ext = filepath.lower().endswith
+    fv = {}
+    
+    if ext('.flac'):
+        try:
+            from mutagen.flac import FLAC
+            audio = FLAC(filepath)
+            for f in fields:
+                frame = f.get("id3_frame", "")
+                if not frame: continue
+                if frame.startswith("TXXX:"):
+                    desc = frame.split(":", 1)[1].lower()
+                    val = audio.get(desc, [])
+                    if val: fv[f["id"]] = str(val[0])
+                elif frame == "TIT2":
+                    if audio.get("title"): fv[f["id"]] = str(audio["title"][0])
+                elif frame == "TPE1":
+                    if audio.get("artist"): fv[f["id"]] = str(audio["artist"][0])
+                elif frame == "TALB":
+                    if audio.get("album"): fv[f["id"]] = str(audio["album"][0])
+                elif frame == "TDRC":
+                    if audio.get("date"): fv[f["id"]] = str(audio["date"][0])
+                elif frame == "TCON":
+                    if audio.get("genre"): fv[f["id"]] = str(audio["genre"][0])
+        except Exception:
+            pass
+            
+    elif ext('.mp3') or ext('.wav'):
+        try:
+            if ext('.wav'):
+                from mutagen.wave import WAVE
+                audio = WAVE(filepath).tags
+            else:
+                from mutagen.id3 import ID3
+                audio = ID3(filepath)
+                
+            if audio:
+                for f in fields:
+                    frame = f.get("id3_frame", "")
+                    if not frame: continue
+                    if frame.startswith("TXXX:"):
+                        desc = frame.split(":", 1)[1].upper()
+                        for tag in audio.getall("TXXX"):
+                            if tag.desc.upper() == desc:
+                                fv[f["id"]] = str(tag.text[0])
+                                break
+                    else:
+                        if frame in audio:
+                            fv[f["id"]] = str(audio[frame].text[0])
+        except Exception:
+            pass
+            
+    return fv
 
 def rename_file(old_path: str, new_filename: str) -> str:
     """Rename a file to new_filename in the same directory. Returns new full path."""

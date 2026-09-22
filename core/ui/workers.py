@@ -147,6 +147,9 @@ class ScanWorker(QThread):
                 raw_t    = title_case_smart(raw_t)
                 remixer  = title_case_smart(remixer)
 
+                from core.tagger import read_tags
+                tags_fv = read_tags(path, cfg.get('fields', DEFAULT_FIELDS))
+
                 parsed_fv = {
                     "file_type":  file_type,
                     "artist":     artist,
@@ -170,6 +173,8 @@ class ScanWorker(QThread):
                     if field["id"] == "file_type":
                         continue
                     new_val = get_field_value(field, temp_row, allow_discogs=False)
+                    if not new_val:
+                        new_val = tags_fv.get(field["id"], "")
                     fv[field["id"]] = new_val
                     temp_row["fields"][field["id"]] = new_val
                     

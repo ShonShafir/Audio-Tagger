@@ -303,8 +303,6 @@ class DiscogsWorker(QThread):
                 
                 if self.target_cells is not None:
                     row_allowed = self.target_cells[i]
-                    if self.allowed_fields is not None:
-                        row_allowed = row_allowed.intersection(self.allowed_fields)
                 else:
                     row_allowed = self.allowed_fields
 
@@ -348,7 +346,9 @@ class DiscogsWorker(QThread):
                         lead_words = set(re.sub(r"[^a-z0-9 ]", "", lead_artist.lower()).split())
                         scored = []
                         for r in candidates:
-                            catno_ok     = (_norm(r.get("catno", "")) == norm_exp)
+                            catno_ok = False
+                            if norm_exp:
+                                catno_ok = (_norm(r.get("catno", "")) == norm_exp)
                             r_title_norm = re.sub(r"[^a-z0-9 ]", "", r.get("title", "").lower())
                             artist_score = sum(1 for w in lead_words if w in r_title_norm)
                             scored.append((catno_ok, artist_score, r))

@@ -173,14 +173,18 @@ class ScanWorker(QThread):
                     if field["id"] == "file_type":
                         continue
                     new_val = get_field_value(field, temp_row, allow_discogs=False)
+                    came_from_tag = False
                     if not new_val:
                         new_val = tags_fv.get(field["id"], "")
+                        if new_val:
+                            came_from_tag = True
+                            
                     fv[field["id"]] = new_val
                     temp_row["fields"][field["id"]] = new_val
                     
-                    # Always apply transforms
+                    # Always apply transforms (unless the value was pulled verbatim from the file's existing tags)
                     xform = field.get("transform", "")
-                    if xform and field["id"] in fv and fv[field["id"]]:
+                    if xform and not came_from_tag and field["id"] in fv and fv[field["id"]]:
                         fv[field["id"]] = apply_transform(fv[field["id"]], xform)
                         temp_row["fields"][field["id"]] = fv[field["id"]]
 

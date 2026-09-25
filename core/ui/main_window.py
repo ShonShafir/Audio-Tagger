@@ -179,7 +179,7 @@ class MainWindow(QMainWindow, TaggerTabMixin):
                 self.folder_lbl.setText(path)
                 self.folder_lbl.setStyleSheet("color:#a6e3a1;")
                 self.sb.showMessage(f"Folder dropped: {path} — scanning…")
-                self.run_scan()
+                self.run_scan(force_full=True)
                 break
 
 
@@ -202,7 +202,7 @@ class MainWindow(QMainWindow, TaggerTabMixin):
             # make feat_format / strip_original_mix / transforms apply to the
             # rows that are already in the table.
             self.sb.showMessage("Settings saved — re-scanning with new settings…")
-            self.run_scan()
+            self.run_scan(force_full=True)
         else:
             self.sb.showMessage("Settings saved.")
 

@@ -744,7 +744,7 @@ class TaggerTabMixin:
             if label in self._col_map:
                 col_to_field[self._col_map[label]] = field.get("id")
 
-        if selected_items:
+        if selected_items and not force_full:
             for item in selected_items:
                 r = item.row()
                 c = item.column()
@@ -783,7 +783,7 @@ class TaggerTabMixin:
         self.progress.setValue(100)
         QTimer.singleShot(2500, lambda: (self.progress.setValue(0), self.progress.hide()))
 
-    def run_scan(self):
+    def run_scan(self, force_full=False):
         # Stop any running workers (e.g. an in-progress Discogs fetch) before starting fresh
         for w in self._workers:
             if hasattr(w, "stop"):
@@ -807,7 +807,7 @@ class TaggerTabMixin:
         selected_items = self.table.selectedItems()
         target_paths = None
         
-        if selected_items:
+        if selected_items and not force_full:
             # Map column index to field ID (identical to Discogs fetch)
             col_to_field = {}
             for field in self.cfg.get("fields", []):
@@ -884,7 +884,7 @@ class TaggerTabMixin:
 
         selected_items = self.table.selectedItems()
         target_cells = None
-        if selected_items:
+        if selected_items and not force_full:
             # Map column index to field ID
             col_to_field = {}
             for field in self.cfg.get("fields", []):

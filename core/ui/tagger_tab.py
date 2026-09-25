@@ -31,7 +31,7 @@ from PyQt6.QtWidgets import (
     QFileDialog, QTableWidget, QTableWidgetItem, QHeaderView,
     QProgressBar, QAbstractItemView, QMessageBox, QMenu, QDialog, QApplication,
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QColor
 
 from core.config import DEFAULT_FIELDS, FIXED_COLS
@@ -775,6 +775,8 @@ class TaggerTabMixin:
                                     item.setText(new_val)
                             
         self.sb.showMessage("Transforms applied.")
+        self.progress.setValue(100)
+        QTimer.singleShot(2500, lambda: self.progress.setValue(0))
 
     def run_scan(self):
         # Stop any running workers (e.g. an in-progress Discogs fetch) before starting fresh
@@ -854,6 +856,7 @@ class TaggerTabMixin:
         self.col_btn.setEnabled(True)
         self.find_replace_btn.setEnabled(True)
         self.progress.setValue(100)
+        QTimer.singleShot(2500, lambda: self.progress.setValue(0))
         self.sb.showMessage(
             f"Parsed {len(rows)} tracks. Edit any cell, then Apply — or Fetch Discogs first."
         )
@@ -919,6 +922,7 @@ class TaggerTabMixin:
         self.discogs_btn.setEnabled(True)
         self.transform_btn.setEnabled(True)
         self.progress.setValue(100)
+        QTimer.singleShot(2500, lambda: self.progress.setValue(0))
         self.sb.showMessage(f"Discogs done. {len(self.covers)} covers downloaded.")
 
 
@@ -962,6 +966,7 @@ class TaggerTabMixin:
         w.complete.connect(lambda: (
             self.apply_btn.setEnabled(True),
             self.progress.setValue(100),
+            QTimer.singleShot(2500, lambda: self.progress.setValue(0)),
             QMessageBox.information(
                 self, "Done",
                 "All selected tracks tagged and renamed successfully!",

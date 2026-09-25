@@ -159,6 +159,10 @@ class TaggerTabMixin:
         bot = QHBoxLayout()
         self.progress = QProgressBar()
         self.progress.setValue(0)
+        sp = self.progress.sizePolicy()
+        sp.setRetainSizeWhenHidden(True)
+        self.progress.setSizePolicy(sp)
+        self.progress.hide()
         bot.addWidget(self.progress)
 
         self.pause_btn = QPushButton("\u23f8 Pause")   # ⏸
@@ -775,8 +779,9 @@ class TaggerTabMixin:
                                     item.setText(new_val)
                             
         self.sb.showMessage("Transforms applied.")
+        self.progress.show()
         self.progress.setValue(100)
-        QTimer.singleShot(2500, lambda: self.progress.setValue(0))
+        QTimer.singleShot(2500, lambda: (self.progress.setValue(0), self.progress.hide()))
 
     def run_scan(self):
         # Stop any running workers (e.g. an in-progress Discogs fetch) before starting fresh
@@ -796,6 +801,7 @@ class TaggerTabMixin:
         self.pause_btn.setEnabled(True)
         self.pause_btn.setChecked(False)
         self.pause_btn.setText("\u23f8 Pause")
+        self.progress.show()
         self.progress.setValue(0)
 
         selected_items = self.table.selectedItems()
@@ -856,7 +862,7 @@ class TaggerTabMixin:
         self.col_btn.setEnabled(True)
         self.find_replace_btn.setEnabled(True)
         self.progress.setValue(100)
-        QTimer.singleShot(2500, lambda: self.progress.setValue(0))
+        QTimer.singleShot(2500, lambda: (self.progress.setValue(0), self.progress.hide()))
         self.sb.showMessage(
             f"Parsed {len(rows)} tracks. Edit any cell, then Apply — or Fetch Discogs first."
         )
@@ -873,6 +879,7 @@ class TaggerTabMixin:
         self.pause_btn.setEnabled(True)
         self.pause_btn.setChecked(False)
         self.pause_btn.setText("\u23f8 Pause")
+        self.progress.show()
         self.progress.setValue(0)
 
         selected_items = self.table.selectedItems()
@@ -922,7 +929,7 @@ class TaggerTabMixin:
         self.discogs_btn.setEnabled(True)
         self.transform_btn.setEnabled(True)
         self.progress.setValue(100)
-        QTimer.singleShot(2500, lambda: self.progress.setValue(0))
+        QTimer.singleShot(2500, lambda: (self.progress.setValue(0), self.progress.hide()))
         self.sb.showMessage(f"Discogs done. {len(self.covers)} covers downloaded.")
 
 
@@ -959,6 +966,7 @@ class TaggerTabMixin:
 
         self.cfg = self.settings_tab.get_cfg()
         self.apply_btn.setEnabled(False)
+        self.progress.show()
         self.progress.setValue(0)
 
         w = ApplyWorker(enabled, self.cfg, self.covers)
@@ -966,7 +974,7 @@ class TaggerTabMixin:
         w.complete.connect(lambda: (
             self.apply_btn.setEnabled(True),
             self.progress.setValue(100),
-            QTimer.singleShot(2500, lambda: self.progress.setValue(0)),
+            QTimer.singleShot(2500, lambda: (self.progress.setValue(0), self.progress.hide())),
             QMessageBox.information(
                 self, "Done",
                 "All selected tracks tagged and renamed successfully!",

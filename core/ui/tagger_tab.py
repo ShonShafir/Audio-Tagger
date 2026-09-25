@@ -169,6 +169,10 @@ class TaggerTabMixin:
         self.pause_btn.setEnabled(False)
         self.pause_btn.setCheckable(True)
         self.pause_btn.clicked.connect(self._toggle_pause)
+        sp = self.pause_btn.sizePolicy()
+        sp.setRetainSizeWhenHidden(True)
+        self.pause_btn.setSizePolicy(sp)
+        self.pause_btn.hide()
         bot.addWidget(self.pause_btn)
 
         layout.addLayout(bot)
@@ -801,6 +805,7 @@ class TaggerTabMixin:
         self.pause_btn.setEnabled(True)
         self.pause_btn.setChecked(False)
         self.pause_btn.setText("\u23f8 Pause")
+        self.pause_btn.show()
         self.progress.show()
         self.progress.setValue(0)
 
@@ -852,7 +857,7 @@ class TaggerTabMixin:
 
 
     def _scan_done(self, rows: list):
-        self.pause_btn.setEnabled(False)
+        self.pause_btn.hide()
         self.rows = rows
         self._fill_table(rows)
         self.scan_btn.setEnabled(True)   # always keep Re-scan available after first parse
@@ -879,6 +884,7 @@ class TaggerTabMixin:
         self.pause_btn.setEnabled(True)
         self.pause_btn.setChecked(False)
         self.pause_btn.setText("\u23f8 Pause")
+        self.pause_btn.show()
         self.progress.show()
         self.progress.setValue(0)
 
@@ -925,7 +931,7 @@ class TaggerTabMixin:
 
 
     def _discogs_done(self):
-        self.pause_btn.setEnabled(False)
+        self.pause_btn.hide()
         self.discogs_btn.setEnabled(True)
         self.transform_btn.setEnabled(True)
         self.progress.setValue(100)

@@ -86,6 +86,11 @@ class TaggerTabMixin:
         self.discogs_btn.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.discogs_btn.customContextMenuRequested.connect(self._show_discogs_menu)
         self.discogs_btn.clicked.connect(self.run_discogs)
+        
+        self.transform_btn = QPushButton("Transform")
+        self.transform_btn.setEnabled(False)
+        self.transform_btn.setToolTip("Apply text transforms to selected cells (Ctrl+T)")
+        self.transform_btn.clicked.connect(self.run_transforms)
 
         self.col_btn = QPushButton("Columns")
         self.col_btn.setEnabled(False)
@@ -105,6 +110,7 @@ class TaggerTabMixin:
         top.addWidget(self.folder_lbl, 1)
         top.addWidget(self.scan_btn)
         top.addWidget(self.discogs_btn)
+        top.addWidget(self.transform_btn)
         top.addWidget(self.col_btn)
         top.addWidget(self.find_replace_btn)
         top.addWidget(self.apply_btn)
@@ -720,6 +726,56 @@ class TaggerTabMixin:
 
     # ── Scan workflow ─────────────────────────────────────────────────────────
 
+
+    def run_transforms(self):
+        self.cfg = self.settings_tab.get_cfg()
+        fields = self.cfg.get("fields", [])
+        
+        selected_items = self.table.selectedItems()
+        target_cells_by_row = {}
+        
+        col_to_field = {}
+        for field in fields:
+            label = field.get("label")
+            if label in self._col_map:
+                col_to_field[self._col_map[label]] = field.get("id")
+
+        if selected_items:
+            for item in selected_items:
+                r = item.row()
+                c = item.column()
+                fid = col_to_field.get(c)
+                if fid:
+                    target_cells_by_row.setdefault(r, set()).add(fid)
+        else:
+            allowed = self.get_allowed_fields()
+            for r in range(len(self.rows)):
+                target_cells_by_row[r] = allowed
+                
+        from core.transforms import apply_transform
+        
+        for r, fids in target_cells_by_row.items():
+            if r >= len(self.rows): continue
+            row_data = self.rows[r]
+            for field in fields:
+                if field["id"] not in fids:
+                    continue
+                xform = field.get("transform", "")
+                if xform:
+                    old_val = row_data["fields"].get(field["id"], "")
+                    if old_val:
+                        new_val = apply_transform(old_val, xform)
+                        if new_val != old_val:
+                            label = field.get("label")
+                            if label in self._col_map:
+                                c = self._col_map[label]
+                                item = self.table.item(r, c)
+                                if item:
+                                    # This triggers itemChanged, which updates row_data["fields"] and recalculates proposed filename automatically!
+                                    item.setText(new_val)
+                            
+        self.sb.showMessage("Transforms applied.")
+
     def run_scan(self):
         # Stop any running workers (e.g. an in-progress Discogs fetch) before starting fresh
         for w in self._workers:
@@ -734,6 +790,7 @@ class TaggerTabMixin:
 
         self.cfg = self.settings_tab.get_cfg()
         self.discogs_btn.setEnabled(False)
+        self.transform_btn.setEnabled(False)
         self.pause_btn.setEnabled(True)
         self.pause_btn.setChecked(False)
         self.pause_btn.setText("\u23f8 Pause")
@@ -792,6 +849,7 @@ class TaggerTabMixin:
         self._fill_table(rows)
         self.scan_btn.setEnabled(True)   # always keep Re-scan available after first parse
         self.discogs_btn.setEnabled(True)
+        self.transform_btn.setEnabled(True)
         self.apply_btn.setEnabled(True)
         self.col_btn.setEnabled(True)
         self.find_replace_btn.setEnabled(True)
@@ -807,6 +865,7 @@ class TaggerTabMixin:
         self.cfg  = self.settings_tab.get_cfg()
         self.rows = self._read_rows()
         self.discogs_btn.setEnabled(False)
+        self.transform_btn.setEnabled(False)
         # NOTE: scan_btn intentionally NOT disabled here — user can always Re-scan
         self.pause_btn.setEnabled(True)
         self.pause_btn.setChecked(False)
@@ -848,6 +907,7 @@ class TaggerTabMixin:
         w.error.connect(lambda e: (
             QMessageBox.critical(self, "Discogs Error", e),
             self.discogs_btn.setEnabled(True),
+            self.transform_btn.setEnabled(True),
             self.pause_btn.setEnabled(False),
         ))
         self._workers.append(w)
@@ -857,6 +917,7 @@ class TaggerTabMixin:
     def _discogs_done(self):
         self.pause_btn.setEnabled(False)
         self.discogs_btn.setEnabled(True)
+        self.transform_btn.setEnabled(True)
         self.progress.setValue(100)
         self.sb.showMessage(f"Discogs done. {len(self.covers)} covers downloaded.")
 

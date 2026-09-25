@@ -182,11 +182,7 @@ class ScanWorker(QThread):
                     fv[field["id"]] = new_val
                     temp_row["fields"][field["id"]] = new_val
                     
-                    # Always apply transforms (unless the value was pulled verbatim from the file's existing tags)
-                    xform = field.get("transform", "")
-                    if xform and not came_from_tag and field["id"] in fv and fv[field["id"]]:
-                        fv[field["id"]] = apply_transform(fv[field["id"]], xform)
-                        temp_row["fields"][field["id"]] = fv[field["id"]]
+
 
                 # ── Merge with existing row (respects locked and targeted columns) ──
                 existing_cover = b""
@@ -425,12 +421,7 @@ class DiscogsWorker(QThread):
                         new_fv[field["id"]] = new_val
                         temp_row["fields"][field["id"]] = new_val
                         
-                    # Re-apply transforms if it changed
-                    if new_val:
-                        xform = field.get("transform", "")
-                        if xform:
-                            new_fv[field["id"]] = apply_transform(new_fv[field["id"]], xform)
-                            temp_row["fields"][field["id"]] = new_fv[field["id"]]
+
 
                 tmpl     = cfg.get("naming_template", "({catno}) {artist} - {title}.mp3")
                 proposed = build_proposed_filename(

@@ -319,6 +319,9 @@ class TaggerTabMixin:
                 break
                 
         if not field_id:
+            # If they manually edited the Proposed Filename column, we should still run the duplicate check
+            if self._col_map.get("Proposed Filename") == col:
+                self._check_duplicates()
             return
             
         self.rows[row]["fields"][field_id] = item.text()

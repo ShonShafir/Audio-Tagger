@@ -602,29 +602,27 @@ class YouTubeWorker(QThread):
                 cover  = cache_cov.get(cache_key, b"")
 
                 if not result:
-                    self.progress.emit(int(100 * (i + 1) / total), f"Skipped (No YouTube match): {row['original']}")
-                    continue
-
-                new_fv = dict(row["fields"])
+                    # Still need to process to allow fallback/template resolution even if no match
+                    result = None
                 
-                # We can map standard fields manually since YouTube JSON isn't as robust as Discogs
-                # Title
-                if ("__all__" in row_allowed) or ("title" in row_allowed):
-                    yt_title = result.get("title", "")
-                    if yt_title:
-                        new_fv["title"] = yt_title
+                new_fv = dict(row["fields"])
+                temp_row = {"fields": new_fv, "fields_orig": row.get("fields_orig", {}), 
+                            "proposed": row.get("proposed", ""), "original": row.get("original", "")}
 
-                # Artist
-                if ("__all__" in row_allowed) or ("artist" in row_allowed):
-                    yt_artists = result.get("artists", [])
-                    if yt_artists:
-                        new_fv["artist"] = yt_artists[0].get("name", "")
-
-                # Album
-                if ("__all__" in row_allowed) or ("album" in row_allowed):
-                    yt_album = result.get("album", {})
-                    if yt_album and yt_album.get("name"):
-                        new_fv["album"] = yt_album["name"]
+                from core.evaluate import get_field_value
+                for field in fields:
+                    if row_allowed is not None and field["id"] not in row_allowed and "__all__" not in row_allowed:
+                        continue
+                        
+                    src = field.get("source", "parsed")
+                    if src == "parsed" or src == "static" or src == "discogs":
+                        continue
+                        
+                    new_val = get_field_value(field, temp_row, allow_discogs=False, youtube_data=result, allow_youtube=True)
+                        
+                    if new_val:
+                        new_fv[field["id"]] = new_val
+                        temp_row["fields"][field["id"]] = new_val
 
                 # Recalculate proposed
                 from core.parser import build_proposed_filename

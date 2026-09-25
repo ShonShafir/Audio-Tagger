@@ -33,10 +33,23 @@ def evaluate_template(template_str: str, ctx: dict) -> str:
         return str(ctx.get(key, ""))
     return re.sub(r'\{([a-zA-Z0-9_]+)\}', repl, template_str).strip()
 
-def get_field_value(field_cfg: dict, row: dict, discogs_data: dict = None, allow_discogs: bool = True) -> str:
+def resolve_youtube_value(youtube_data: dict, fid: str) -> str:
+    if not youtube_data: return ""
+    if fid == "title":
+        return youtube_data.get("title", "")
+    elif fid == "artist":
+        artists = youtube_data.get("artists", [])
+        if artists:
+            return artists[0].get("name", "")
+    elif fid == "album":
+        album = youtube_data.get("album", {})
+        if album and album.get("name"):
+            return album["name"]
+    return ""
+
+def get_field_value(field_cfg: dict, row: dict, discogs_data: dict = None, allow_discogs: bool = True, youtube_data: dict = None, allow_youtube: bool = True) -> str:
     """
-    Evaluates a single field based on its source (parsed, static, discogs, template, fallback).
-    If allow_discogs is False, we skip discogs lookups (useful during initial scan).
+    Evaluates a single field based on its source (parsed, static, discogs, youtube, template, fallback).
     """
     fid = field_cfg["id"]
     source = field_cfg.get("source", "parsed")
@@ -51,6 +64,12 @@ def get_field_value(field_cfg: dict, row: dict, discogs_data: dict = None, allow
                 return ""
             if discogs_data:
                 return resolve_discogs_value(discogs_data, field_cfg.get("discogs_field", ""))
+            return ""
+        elif src == "youtube":
+            if not allow_youtube:
+                return ""
+            if youtube_data:
+                return resolve_youtube_value(youtube_data, fid)
             return ""
         elif src == "template":
             tmpl = field_cfg.get("template_value", "")

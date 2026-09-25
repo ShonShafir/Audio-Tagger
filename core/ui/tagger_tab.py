@@ -349,6 +349,37 @@ class TaggerTabMixin:
                 else:
                     container.setStyleSheet("background-color: transparent; border: none;")
 
+
+    def refresh_ui_from_settings(self):
+        """Update columns and proposed filenames using existing row data."""
+        if not hasattr(self, 'rows') or not self.rows:
+            return
+            
+        # Preserve user edits before rebuilding
+        self.rows = self._read_rows()
+        
+        # Recalculate proposed filenames based on new template
+        tmpl = self.cfg.get("naming_template", "({catno}) {artist} - {title}")
+        feat_fmt = self.cfg.get("feat_format", "ft.")
+        
+        for r in self.rows:
+            fv = r.get("fields", {})
+            ext = os.path.splitext(r.get("path", ""))[1]
+            r["proposed"] = sanitize_filename(
+                build_proposed_filename(
+                    tmpl, 
+                    fv.get("catno", ""), 
+                    fv.get("artist", ""), 
+                    fv.get("featured", ""), 
+                    fv.get("title", ""),
+                    feat_format=feat_fmt,
+                    original_ext=ext
+                )
+            )
+            
+        # Rebuild table entirely
+        self._fill_table(self.rows)
+
     def _fill_table(self, rows: list):
         """Clear the table, rebuild columns, and repopulate from *rows*."""
         self._build_cols()

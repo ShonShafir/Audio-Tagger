@@ -189,7 +189,12 @@ class MainWindow(QMainWindow, TaggerTabMixin):
         """Called when the user clicks Apply or Save in the Settings tab."""
         self.cfg = cfg
         self._apply_theme(cfg)
-        self.sb.showMessage("Settings saved. (Click Re-scan if you want them to apply to loaded files)")
+        
+        if self.folder:
+            # Safely refresh proposed filenames and columns in memory without re-scanning disk
+            self.refresh_ui_from_settings()
+            
+        self.sb.showMessage("Settings saved. Table refreshed with new template and columns.")
 
     # ── Help tab ──────────────────────────────────────────────────────────────
 

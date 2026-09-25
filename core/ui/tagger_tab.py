@@ -744,7 +744,7 @@ class TaggerTabMixin:
             if label in self._col_map:
                 col_to_field[self._col_map[label]] = field.get("id")
 
-        if selected_items and not force_full:
+        if selected_items:
             for item in selected_items:
                 r = item.row()
                 c = item.column()
@@ -884,7 +884,7 @@ class TaggerTabMixin:
 
         selected_items = self.table.selectedItems()
         target_cells = None
-        if selected_items and not force_full:
+        if selected_items:
             # Map column index to field ID
             col_to_field = {}
             for field in self.cfg.get("fields", []):

@@ -916,10 +916,35 @@ class TaggerTabMixin:
         self.progress.show()
         self.progress.setValue(0)
         
+        selected_items = self.table.selectedItems()
+        target_cells = None
+        if selected_items:
+            col_to_field = {}
+            for field in self.cfg.get("fields", []):
+                label = field.get("label")
+                if label in self._col_map:
+                    col_to_field[self._col_map[label]] = field.get("id")
+            if "Cover" in self._col_map:
+                col_to_field[self._col_map["Cover"]] = "__cover__"
+
+            target_cells = {}
+            for item in selected_items:
+                r = item.row()
+                c = item.column()
+                if c in col_to_field:
+                    if r not in target_cells:
+                        target_cells[r] = set()
+                    target_cells[r].add(col_to_field[c])
+            for item in selected_items:
+                r = item.row()
+                if r not in target_cells:
+                    target_cells[r] = set()
+
+        allowed = self.get_allowed_fields()
         from core.ui.workers import YouTubeWorker
-        w = YouTubeWorker(self.rows, self.cfg, self.folder)
+        w = YouTubeWorker(self.rows, self.cfg, self.folder, allowed_fields=allowed, target_cells=target_cells)
         w.progress.connect(lambda p, m: (self.progress.setValue(p), self.sb.showMessage(m)))
-        w.row_updated.connect(self._update_row_cover)
+        w.row_updated.connect(self._update_row)
         w.complete.connect(self._youtube_done)
         w.error.connect(lambda e: (
             QMessageBox.critical(self, "YouTube Error", e),

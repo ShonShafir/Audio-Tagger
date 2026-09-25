@@ -609,19 +609,19 @@ class YouTubeWorker(QThread):
                 
                 # We can map standard fields manually since YouTube JSON isn't as robust as Discogs
                 # Title
-                if ("youtube" in row_allowed) or ("youtube" in [f["source"] for f in fields if f["id"] == "title"]):
+                if ("__all__" in row_allowed) or ("title" in row_allowed):
                     yt_title = result.get("title", "")
                     if yt_title:
                         new_fv["title"] = yt_title
 
                 # Artist
-                if ("youtube" in row_allowed) or ("youtube" in [f["source"] for f in fields if f["id"] == "artist"]):
+                if ("__all__" in row_allowed) or ("artist" in row_allowed):
                     yt_artists = result.get("artists", [])
                     if yt_artists:
                         new_fv["artist"] = yt_artists[0].get("name", "")
 
                 # Album
-                if ("youtube" in row_allowed) or ("youtube" in [f["source"] for f in fields if f["id"] == "album"]):
+                if ("__all__" in row_allowed) or ("album" in row_allowed):
                     yt_album = result.get("album", {})
                     if yt_album and yt_album.get("name"):
                         new_fv["album"] = yt_album["name"]

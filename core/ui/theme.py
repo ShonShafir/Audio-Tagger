@@ -31,6 +31,8 @@ PALETTE_LABELS = {
     "accent_disabled":  "Disabled button",
     "border":           "Borders & grid lines",
     "error":            "Error / warning colour",
+    "accent_apply":     "Apply Button Accent",
+    "accent_apply_hover": "Apply Button Hover",
 }
 
 # ── Built-in presets ──────────────────────────────────────────────────────────
@@ -53,6 +55,8 @@ PRESETS: dict[str, dict[str, str]] = {
         "accent_disabled": "#45475a",
         "border":          "#45475a",
         "error":           "#f38ba8",
+        "accent_apply":    "#a6e3a1",
+        "accent_apply_hover": "#94e2d5",
     },
     "Light": {
         "bg_base":         "#ffffff",
@@ -89,6 +93,8 @@ PRESETS: dict[str, dict[str, str]] = {
         "accent_disabled": "#44475a",
         "border":          "#6272a4",
         "error":           "#ff5555",
+        "accent_apply":    "#50fa7b",
+        "accent_apply_hover": "#8be9fd",
     },
     "Nord": {
         "bg_base":         "#2e3440",
@@ -107,6 +113,8 @@ PRESETS: dict[str, dict[str, str]] = {
         "accent_disabled": "#434c5e",
         "border":          "#4c566a",
         "error":           "#bf616a",
+        "accent_apply":    "#a3be8c",
+        "accent_apply_hover": "#8fbcbb",
     },
     "Solarized Dark": {
         "bg_base":         "#002b36",
@@ -219,6 +227,13 @@ def build_stylesheet(p: dict) -> str:
     }}
     QPushButton:hover {{
         background: {d['accent_hover']};
+    }}
+    QPushButton#btnApply {{
+        background: {d.get('accent_apply', d['accent'])};
+        color: #1e1e2e;
+    }}
+    QPushButton#btnApply:hover {{
+        background: {d.get('accent_apply_hover', d['accent_hover'])};
     }}
     QPushButton:disabled {{
         background: {d['accent_disabled']};

@@ -127,7 +127,7 @@ class ThemeSettingsWidget(QWidget):
             "text_primary", "text_muted", "text_readonly"
         ]),
         ("Accents & Status", [
-            "accent", "accent_hover", "accent_disabled", "border", "error"
+            "accent", "accent_hover", "accent_disabled", "border", "error", "accent_apply", "accent_apply_hover"
         ])
     ]
 

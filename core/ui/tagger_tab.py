@@ -349,6 +349,7 @@ class TaggerTabMixin:
                 self.table.blockSignals(True)
                 prop_item.setText(proposed)
                 self.table.blockSignals(False)
+        self._check_duplicates()
 
     def _update_cover_selection_styles(self):
         """Add a blue highlight border to selected cover cells, since setCellWidget obscures it."""

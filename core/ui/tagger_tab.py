@@ -873,6 +873,7 @@ class TaggerTabMixin:
         w.complete.connect(self._scan_done)
         w.error.connect(lambda e: (
             QMessageBox.critical(self, "Scan Error", e),
+            self.scan_btn.setEnabled(True),
             self.pause_btn.setEnabled(False),
         ))
         self._workers.append(w)
@@ -922,6 +923,7 @@ class TaggerTabMixin:
         w.complete.connect(self._youtube_done)
         w.error.connect(lambda e: (
             QMessageBox.critical(self, "YouTube Error", e),
+            self.scan_btn.setEnabled(True),
             self.discogs_btn.setEnabled(True),
             self.youtube_btn.setEnabled(True),
             self.transform_btn.setEnabled(True),
@@ -933,6 +935,7 @@ class TaggerTabMixin:
         
     def _youtube_done(self):
         self.pause_btn.hide()
+        self.scan_btn.setEnabled(True)
         self.discogs_btn.setEnabled(True)
         self.youtube_btn.setEnabled(True)
         self.transform_btn.setEnabled(True)
@@ -989,6 +992,7 @@ class TaggerTabMixin:
         w.complete.connect(self._discogs_done)
         w.error.connect(lambda e: (
             QMessageBox.critical(self, "Discogs Error", e),
+            self.scan_btn.setEnabled(True),
             self.discogs_btn.setEnabled(True),
             self.youtube_btn.setEnabled(True),
             self.transform_btn.setEnabled(True),
@@ -1000,6 +1004,7 @@ class TaggerTabMixin:
 
     def _discogs_done(self):
         self.pause_btn.hide()
+        self.scan_btn.setEnabled(True)
         self.discogs_btn.setEnabled(True)
         self.youtube_btn.setEnabled(True)
         self.transform_btn.setEnabled(True)
@@ -1056,6 +1061,7 @@ class TaggerTabMixin:
         w.complete.connect(_on_apply_complete)
         w.error.connect(lambda e: (
             QMessageBox.critical(self, "Apply Error", e),
+            self.scan_btn.setEnabled(True),
             self.apply_btn.setEnabled(True),
         ))
         self._workers.append(w)

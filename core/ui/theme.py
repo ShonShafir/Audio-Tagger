@@ -75,6 +75,8 @@ PRESETS: dict[str, dict[str, str]] = {
         "accent_disabled": "#bdbdbd",
         "border":          "#cccccc",
         "error":           "#c62828",
+        "accent_apply":    "#2e7d32",
+        "accent_apply_hover": "#4caf50",
     },
     "Dracula": {
         "bg_base":         "#282a36",
@@ -133,6 +135,8 @@ PRESETS: dict[str, dict[str, str]] = {
         "accent_disabled": "#073642",
         "border":          "#586e75",
         "error":           "#dc322f",
+        "accent_apply":    "#859900",
+        "accent_apply_hover": "#b58900",
     },
     "Solarized Light": {
         "bg_base":         "#fdf6e3",
@@ -151,6 +155,8 @@ PRESETS: dict[str, dict[str, str]] = {
         "accent_disabled": "#eee8d5",
         "border":          "#93a1a1",
         "error":           "#dc322f",
+        "accent_apply":    "#859900",
+        "accent_apply_hover": "#2aa198",
     },
     "Monokai": {
         "bg_base":         "#272822",
@@ -164,11 +170,13 @@ PRESETS: dict[str, dict[str, str]] = {
         "text_primary":    "#f8f8f2",
         "text_muted":      "#75715e",
         "text_readonly":   "#75715e",
-        "accent":          "#a6e22e",
+        "accent":          "#66d9ef",
         "accent_hover":    "#fd971f",
         "accent_disabled": "#49483e",
         "border":          "#75715e",
         "error":           "#f92672",
+        "accent_apply":    "#a6e22e",
+        "accent_apply_hover": "#e6db74",
     },
 }
 
@@ -241,6 +249,28 @@ def build_stylesheet(p: dict) -> str:
     }}
     QPushButton:checked {{
         background: {d['accent_hover']};
+    }}
+    QPushButton[pill="true"] {{
+        background-color: {d['bg_input']};
+        color: {d['text_muted']};
+        border-radius: 12px;
+        padding: 4px 14px;
+        font-weight: 600;
+        border: 2px solid transparent;
+    }}
+    QPushButton[pill="true"]:hover {{
+        background-color: {d['bg_cell_hover']};
+        color: {d['text_primary']};
+    }}
+    QPushButton[pill="true"]:checked {{
+        background-color: transparent;
+        color: {d['accent']};
+        border: 2px solid {d['accent']};
+    }}
+    QPushButton[pill="true"]:checked:hover {{
+        background-color: {d['bg_cell_hover']};
+        color: {d['accent_hover']};
+        border: 2px solid {d['accent_hover']};
     }}
     QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox {{
         background: {d['bg_input']};

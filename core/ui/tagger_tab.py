@@ -234,28 +234,7 @@ class TaggerTabMixin:
             btn.setCheckable(True)
             btn.setChecked(field.get("visible", True))
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
-            btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #313244;
-                    color: #a6adc8;
-                    border-radius: 12px;
-                    padding: 4px 14px;
-                    font-weight: 600;
-                    border: 2px solid transparent;
-                }
-                QPushButton:hover {
-                    background-color: #45475a;
-                    color: #cdd6f4;
-                }
-                QPushButton:checked {
-                    background-color: rgba(137, 180, 250, 0.15);
-                    color: #89b4fa;
-                    border: 2px solid rgba(137, 180, 250, 0.4);
-                }
-                QPushButton:checked:hover {
-                    background-color: rgba(137, 180, 250, 0.25);
-                }
-            """)
+            btn.setProperty("pill", True)
             btn.toggled.connect(lambda checked, f=field: self._toggle_col_visibility(f, checked))
             self.pill_layout.addWidget(btn)
         self.pill_layout.addStretch()

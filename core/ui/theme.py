@@ -185,14 +185,20 @@ def build_stylesheet(p: dict) -> str:
     QTableWidget {{
         background: {d['bg_base']};
         gridline-color: {d['border']};
-        selection-background-color: {d['bg_selection']};
-        alternate-background-color: {d['bg_surface']};
+                alternate-background-color: {d['bg_surface']};
         color: {d['text_primary']};
     }}
     QTableWidget::item {{
         border-right: 1px solid {d['border']};
         border-bottom: 1px solid {d['border']};
         padding: 2px;
+    }}
+    QTableWidget::item:hover {{
+        background-color: {d.get('bg_cell_hover', d['bg_selection'])};
+    }}
+    QTableWidget::item:selected {{
+        background-color: {d.get('bg_cell_selection', d['bg_selection'])};
+        color: {d['text_primary']};
     }}
     QHeaderView::section {{
         background: {d['bg_header']};
@@ -231,8 +237,7 @@ def build_stylesheet(p: dict) -> str:
     QComboBox QAbstractItemView {{
         background: {d['bg_input']};
         color: {d['text_primary']};
-        selection-background-color: {d['bg_selection']};
-    }}
+            }}
     QProgressBar {{
         background: {d['bg_input']};
         border-radius: 4px;

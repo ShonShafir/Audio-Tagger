@@ -544,6 +544,9 @@ class TaggerTabMixin:
             self.sb.showMessage(
                 f"⚠ {dup_rows} rows with duplicate Proposed Filenames — review before applying."
             )
+        else:
+            if "duplicate" in self.sb.currentMessage():
+                self.sb.showMessage("Duplicates resolved.")
 
     # ── Find & Replace ────────────────────────────────────────────────────────
 

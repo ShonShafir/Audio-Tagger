@@ -144,8 +144,6 @@ class TaggerTabMixin:
         self.table.itemSelectionChanged.connect(self._update_cover_selection_styles)
         self.table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.table.customContextMenuRequested.connect(self._table_context_menu)
-        # Double-click a row → play that MP3 in the audio player
-        self.table.cellDoubleClicked.connect(self._on_cell_double_clicked)
         self.table.itemChanged.connect(self._on_item_changed)
         layout.addWidget(self.table)
 
@@ -605,7 +603,7 @@ class TaggerTabMixin:
 
     # ── Audio preview ─────────────────────────────────────────────────────────
 
-    def _on_cell_double_clicked(self, row: int, col: int):
+    def _play_row_audio(self, row: int):
         """Double-clicking any cell plays that row's MP3 in the player bar.
 
         For editable cells Qt will also open the cell editor — that's intentional
@@ -644,7 +642,7 @@ class TaggerTabMixin:
         if action == fix_action:
             self._fix_discogs_match(row)
         elif action == play_action:
-            self._on_cell_double_clicked(row, 0)
+            self._play_row_audio(row)
 
     def _fix_discogs_match(self, row: int):
         """Open a manual Discogs search dialog and update the row."""

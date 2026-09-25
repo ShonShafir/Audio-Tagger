@@ -531,13 +531,13 @@ class TaggerTabMixin:
             if is_dup:
                 dup_rows += 1
 
-            for col in range(self.table.columnCount()):
-                cell_it = self.table.item(ri, col)
-                if cell_it:
-                    if is_dup:
-                        cell_it.setBackground(amber)
-                    else:
-                        cell_it.setBackground(empty_brush)
+            prop_item = self.table.item(ri, prop_col)
+            if prop_item:
+                if is_dup:
+                    prop_item.setForeground(QColor("#f38ba8")) # Red text for duplicates
+                else:
+                    # Restore default text color (CatNo has its own logic but that's a different column)
+                    prop_item.setForeground(QColor("#cdd6f4"))
         self.table.blockSignals(False)
 
         if dup_rows:

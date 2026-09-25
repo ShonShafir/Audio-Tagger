@@ -125,6 +125,8 @@ class TaggerTabMixin:
         # ── Track table ──────────────────────────────────────────────────────
         self.table = QTableWidget()
         self.table.viewport().installEventFilter(self)
+        self.table.viewport().setAttribute(Qt.WidgetAttribute.WA_Hover)
+        self.table.setMouseTracking(True)
         self.table.setAlternatingRowColors(True)
         self.table.setShowGrid(False)
         self.table.setWordWrap(False)

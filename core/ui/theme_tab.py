@@ -118,7 +118,7 @@ class ThemeSettingsWidget(QWidget):
     # Order in which colour rows are displayed
     _ROW_ORDER = [
         "bg_window", "bg_base", "bg_surface", "bg_input",
-        "bg_header", "bg_selection",
+        "bg_header", "bg_selection", "bg_cell_selection", "bg_cell_hover",
         "text_primary", "text_muted", "text_readonly",
         "accent", "accent_hover", "accent_disabled",
         "border", "error",

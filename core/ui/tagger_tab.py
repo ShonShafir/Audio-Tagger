@@ -413,8 +413,6 @@ class TaggerTabMixin:
             item = QTableWidgetItem(val)
             if not field.get("editable", True):
                 item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-            if field["id"] == "catno" and not val:
-                item.setForeground(QColor("#f38ba8"))   # red hint for missing catno
             self.table.setItem(ri, col, item)
 
     def _update_row_cover(self, idx: int, data: bytes):

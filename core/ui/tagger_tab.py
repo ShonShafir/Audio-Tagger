@@ -977,7 +977,7 @@ class TaggerTabMixin:
 
         w = ApplyWorker(enabled, self.cfg, self.covers)
         w.progress.connect(lambda p, m: (self.progress.setValue(p), self.sb.showMessage(m)))
-                def _on_apply_complete():
+        def _on_apply_complete():
             self.apply_btn.setEnabled(True)
             self.progress.setValue(100)
             QTimer.singleShot(2500, lambda: (self.progress.setValue(0), self.progress.hide()))

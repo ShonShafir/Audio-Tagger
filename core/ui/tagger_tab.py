@@ -102,6 +102,7 @@ class TaggerTabMixin:
         self.find_replace_btn.clicked.connect(self.find_replace_action)
 
         self.apply_btn = QPushButton("Apply Tags and Rename")
+        self.apply_btn.setObjectName("btnApply")
         self.apply_btn.setEnabled(False)
         self.apply_btn.setToolTip("Write ID3 tags and rename files  (Ctrl+S)")
         self.apply_btn.clicked.connect(self.apply_action)

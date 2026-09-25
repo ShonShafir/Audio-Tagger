@@ -33,4 +33,3 @@ Write-Host "Compiling Inno Setup Installer..."
 & "C:\Users\User\AppData\Local\Programs\Inno Setup 6\ISCC.exe" setup.iss
 
 Write-Host "Done! Installer is located in Output/AudioTagger_Setup.exe"
-Write-Host " Creating Portable ZIP...\

@@ -170,7 +170,6 @@ class ThemeSettingsWidget(QWidget):
         grid.setSpacing(2)
         grid.setContentsMargins(4, 4, 4, 4)
 
-        from PyQt6.QtWidgets import QFrame
         for group_name, keys in self._GROUPS:
             header = QLabel(group_name)
             font = header.font()

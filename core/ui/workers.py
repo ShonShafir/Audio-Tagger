@@ -300,9 +300,9 @@ class DiscogsWorker(QThread):
                     continue
                 
                 if self.target_cells is not None:
-                    row_allowed = self.target_cells[i]
+                    row_allowed = self.target_cells.get(i, set())
                 else:
-                    row_allowed = self.allowed_fields
+                    row_allowed = self.allowed_fields or set()
 
                 if not self._is_running:
                     break
@@ -567,9 +567,9 @@ class YouTubeWorker(QThread):
                     continue
                 
                 if self.target_cells is not None:
-                    row_allowed = self.target_cells[i]
+                    row_allowed = self.target_cells.get(i, set())
                 else:
-                    row_allowed = self.allowed_fields
+                    row_allowed = self.allowed_fields or set()
 
                 if not self._is_running:
                     break

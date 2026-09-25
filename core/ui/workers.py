@@ -527,3 +527,127 @@ class ApplyWorker(QThread):
         self.complete.emit()
 
 
+import time
+import os
+from PyQt6.QtCore import QThread, pyqtSignal
+from core.config import DEFAULT_FIELDS
+from core.youtube import YouTubeClient
+
+class YouTubeWorker(QThread):
+    progress    = pyqtSignal(int, str)
+    row_updated = pyqtSignal(int, dict, bytes)
+    complete    = pyqtSignal()
+    error       = pyqtSignal(str)
+
+    def __init__(self, rows: list, cfg: dict, folder: str, allowed_fields: set = None, target_cells: dict = None):
+        super().__init__()
+        self.rows           = rows
+        self.cfg            = cfg
+        self.folder         = folder
+        self.allowed_fields = allowed_fields
+        self.target_cells   = target_cells
+        self.is_paused      = False
+        self._is_running    = True
+
+    def pause(self):  self.is_paused   = True
+    def resume(self): self.is_paused   = False
+    def stop(self):   self._is_running = False
+
+    def run(self):
+        try:
+            cfg      = self.cfg
+            fields   = cfg.get("fields", DEFAULT_FIELDS)
+            client   = YouTubeClient()
+            cache_rel: dict = {}
+            cache_cov: dict = {}
+            total = len(self.rows)
+
+            for i, row in enumerate(self.rows):
+                if self.target_cells is not None and i not in self.target_cells:
+                    continue
+                
+                if self.target_cells is not None:
+                    row_allowed = self.target_cells[i]
+                else:
+                    row_allowed = self.allowed_fields
+
+                if not self._is_running:
+                    break
+                while self.is_paused:
+                    time.sleep(0.5)
+                    if not self._is_running:
+                        return
+
+                fv = row["fields"]
+                artist = fv.get("artist", "")
+                title = fv.get("title", "")
+                
+                query = f"{artist} {title}".strip()
+                cache_key = query if query else row["path"]
+
+                if cache_key not in cache_rel:
+                    if query:
+                        result = client.search_track(query)
+                        if result:
+                            cache_rel[cache_key] = result
+                            thumbnails = result.get("thumbnails", [])
+                            if thumbnails:
+                                # get the highest quality thumbnail
+                                best_thumb = thumbnails[-1]["url"]
+                                cache_cov[cache_key] = client.download_image(best_thumb)
+                    else:
+                        cache_rel[cache_key] = None
+
+                result = cache_rel.get(cache_key)
+                cover  = cache_cov.get(cache_key, b"")
+
+                if not result:
+                    self.progress.emit(int(100 * (i + 1) / total), f"Skipped (No YouTube match): {row['original']}")
+                    continue
+
+                new_fv = dict(row["fields"])
+                
+                # We can map standard fields manually since YouTube JSON isn't as robust as Discogs
+                # Title
+                if ("youtube" in row_allowed) or ("youtube" in [f["source"] for f in fields if f["id"] == "title"]):
+                    yt_title = result.get("title", "")
+                    if yt_title:
+                        new_fv["title"] = yt_title
+
+                # Artist
+                if ("youtube" in row_allowed) or ("youtube" in [f["source"] for f in fields if f["id"] == "artist"]):
+                    yt_artists = result.get("artists", [])
+                    if yt_artists:
+                        new_fv["artist"] = yt_artists[0].get("name", "")
+
+                # Album
+                if ("youtube" in row_allowed) or ("youtube" in [f["source"] for f in fields if f["id"] == "album"]):
+                    yt_album = result.get("album", {})
+                    if yt_album and yt_album.get("name"):
+                        new_fv["album"] = yt_album["name"]
+
+                # Recalculate proposed
+                from core.parser import build_proposed_filename
+                from core.transforms import sanitize_filename
+                tmpl = cfg.get("naming_template", "({catno}) {artist} - {title}.mp3")
+                feat_fmt = cfg.get("feat_format", "ft.")
+                ext = os.path.splitext(row.get("path", ""))[1].lower()
+                proposed = build_proposed_filename(
+                    tmpl,
+                    new_fv.get("catno", "UNKNOWN"),
+                    new_fv.get("artist", ""),
+                    new_fv.get("featured", ""),
+                    new_fv.get("title", ""),
+                    feat_format=feat_fmt,
+                    original_ext=ext
+                )
+                new_fv["__proposed__"] = sanitize_filename(proposed)
+
+                self.row_updated.emit(i, new_fv, cover)
+                self.progress.emit(int(100 * (i + 1) / total), f"YouTube {i+1}/{total}: {row['original']}")
+
+            self.complete.emit()
+
+        except Exception as e:
+            import traceback
+            self.error.emit(f"YouTubeWorker Error:\n{traceback.format_exc()}")

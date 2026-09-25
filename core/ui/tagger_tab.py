@@ -87,6 +87,11 @@ class TaggerTabMixin:
         self.discogs_btn.customContextMenuRequested.connect(self._show_discogs_menu)
         self.discogs_btn.clicked.connect(self.run_discogs)
         
+        self.youtube_btn = QPushButton("Fetch YouTube")
+        self.youtube_btn.setEnabled(False)
+        self.youtube_btn.setToolTip("Look up each track on YouTube Music")
+        self.youtube_btn.clicked.connect(self.run_youtube)
+        
         self.transform_btn = QPushButton("Transform")
         self.transform_btn.setEnabled(False)
         self.transform_btn.setToolTip("Apply text transforms to selected cells (Ctrl+T)")
@@ -111,6 +116,7 @@ class TaggerTabMixin:
         top.addWidget(self.folder_lbl, 1)
         top.addWidget(self.scan_btn)
         top.addWidget(self.discogs_btn)
+        top.addWidget(self.youtube_btn)
         top.addWidget(self.transform_btn)
         top.addWidget(self.col_btn)
         top.addWidget(self.find_replace_btn)
@@ -817,6 +823,7 @@ class TaggerTabMixin:
 
         self.cfg = self.settings_tab.get_cfg()
         self.discogs_btn.setEnabled(False)
+        self.youtube_btn.setEnabled(False)
         self.transform_btn.setEnabled(False)
         self.pause_btn.setEnabled(True)
         self.pause_btn.setChecked(False)
@@ -878,6 +885,7 @@ class TaggerTabMixin:
         self._fill_table(rows)
         self.scan_btn.setEnabled(True)   # always keep Re-scan available after first parse
         self.discogs_btn.setEnabled(True)
+        self.youtube_btn.setEnabled(True)
         self.transform_btn.setEnabled(True)
         self.apply_btn.setEnabled(True)
         self.col_btn.setEnabled(True)
@@ -891,10 +899,50 @@ class TaggerTabMixin:
 
     # ── Discogs fetch workflow ────────────────────────────────────────────────
 
+
+    def run_youtube(self):
+        self.cfg  = self.settings_tab.get_cfg()
+        self.rows = self._read_rows()
+        self.discogs_btn.setEnabled(False)
+        self.youtube_btn.setEnabled(False)
+        self.transform_btn.setEnabled(False)
+        self.pause_btn.setEnabled(True)
+        self.pause_btn.setChecked(False)
+        self.pause_btn.show()
+
+        self.progress.show()
+        self.progress.setValue(0)
+        
+        from core.ui.workers import YouTubeWorker
+        w = YouTubeWorker(self.rows, self.cfg, self.folder)
+        w.progress.connect(lambda p, m: (self.progress.setValue(p), self.sb.showMessage(m)))
+        w.row_updated.connect(self._update_row_cover)
+        w.complete.connect(self._youtube_done)
+        w.error.connect(lambda e: (
+            QMessageBox.critical(self, "YouTube Error", e),
+            self.discogs_btn.setEnabled(True),
+            self.youtube_btn.setEnabled(True),
+            self.transform_btn.setEnabled(True),
+            self.pause_btn.setEnabled(False),
+        ))
+        
+        self._workers.append(w)
+        w.start()
+        
+    def _youtube_done(self):
+        self.pause_btn.hide()
+        self.discogs_btn.setEnabled(True)
+        self.youtube_btn.setEnabled(True)
+        self.transform_btn.setEnabled(True)
+        self.progress.setValue(100)
+        QTimer.singleShot(2500, lambda: (self.progress.setValue(0), self.progress.hide()))
+        self.sb.showMessage(f"YouTube search complete.")
+
     def run_discogs(self):
         self.cfg  = self.settings_tab.get_cfg()
         self.rows = self._read_rows()
         self.discogs_btn.setEnabled(False)
+        self.youtube_btn.setEnabled(False)
         self.transform_btn.setEnabled(False)
         # NOTE: scan_btn intentionally NOT disabled here — user can always Re-scan
         self.pause_btn.setEnabled(True)
@@ -939,6 +987,7 @@ class TaggerTabMixin:
         w.error.connect(lambda e: (
             QMessageBox.critical(self, "Discogs Error", e),
             self.discogs_btn.setEnabled(True),
+            self.youtube_btn.setEnabled(True),
             self.transform_btn.setEnabled(True),
             self.pause_btn.setEnabled(False),
         ))
@@ -949,6 +998,7 @@ class TaggerTabMixin:
     def _discogs_done(self):
         self.pause_btn.hide()
         self.discogs_btn.setEnabled(True)
+        self.youtube_btn.setEnabled(True)
         self.transform_btn.setEnabled(True)
         self.progress.setValue(100)
         QTimer.singleShot(2500, lambda: (self.progress.setValue(0), self.progress.hide()))

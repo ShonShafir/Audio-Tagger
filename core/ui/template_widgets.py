@@ -72,7 +72,7 @@ class SourceFallbackWidget(QWidget):
     """
     def __init__(self, current_order: list):
         super().__init__()
-        self.available_sources = ["discogs", "parsed", "static"]
+        self.available_sources = ["discogs", "youtube", "parsed", "static"]
         
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)

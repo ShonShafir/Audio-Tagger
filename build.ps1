@@ -21,7 +21,7 @@ Write-Host "Enabling pip and installing dependencies..."
 (Get-Content "python311._pth") -replace "#import site", "import site" | Set-Content "python311._pth"
 Invoke-WebRequest -Uri "https://bootstrap.pypa.io/get-pip.py" -OutFile "get-pip.py"
 .\python.exe get-pip.py
-.\python.exe -m pip install PyQt6 mutagen requests
+.\python.exe -m pip install PyQt6 mutagen requests ytmusicapi
 
 Write-Host "Copying Audio Tagger application files..."
 Copy-Item "..\app.py" -Destination "."

@@ -822,6 +822,7 @@ class TaggerTabMixin:
         self.covers = {}
 
         self.cfg = self.settings_tab.get_cfg()
+        self.scan_btn.setEnabled(False)
         self.discogs_btn.setEnabled(False)
         self.youtube_btn.setEnabled(False)
         self.transform_btn.setEnabled(False)
@@ -903,6 +904,7 @@ class TaggerTabMixin:
     def run_youtube(self):
         self.cfg  = self.settings_tab.get_cfg()
         self.rows = self._read_rows()
+        self.scan_btn.setEnabled(False)
         self.discogs_btn.setEnabled(False)
         self.youtube_btn.setEnabled(False)
         self.transform_btn.setEnabled(False)
@@ -941,6 +943,7 @@ class TaggerTabMixin:
     def run_discogs(self):
         self.cfg  = self.settings_tab.get_cfg()
         self.rows = self._read_rows()
+        self.scan_btn.setEnabled(False)
         self.discogs_btn.setEnabled(False)
         self.youtube_btn.setEnabled(False)
         self.transform_btn.setEnabled(False)

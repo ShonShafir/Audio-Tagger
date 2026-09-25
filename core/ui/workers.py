@@ -501,7 +501,7 @@ class ApplyWorker(QThread):
                 if proposed and proposed != "UNKNOWN":
                     new_path = os.path.join(os.path.dirname(path), proposed)
                     if path != new_path:
-                        if os.path.exists(new_path):
+                        if os.path.exists(new_path) and path.lower() != new_path.lower():
                             self.error.emit(f"Target already exists: {new_path}")
                             return
                         

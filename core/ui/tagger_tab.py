@@ -977,15 +977,14 @@ class TaggerTabMixin:
 
         w = ApplyWorker(enabled, self.cfg, self.covers)
         w.progress.connect(lambda p, m: (self.progress.setValue(p), self.sb.showMessage(m)))
-        w.complete.connect(lambda: (
-            self.apply_btn.setEnabled(True),
-            self.progress.setValue(100),
-            QTimer.singleShot(2500, lambda: (self.progress.setValue(0), self.progress.hide())),
-            QMessageBox.information(
-                self, "Done",
-                "All selected tracks tagged and renamed successfully!",
-            ),
-        ))
+                def _on_apply_complete():
+            self.apply_btn.setEnabled(True)
+            self.progress.setValue(100)
+            QTimer.singleShot(2500, lambda: (self.progress.setValue(0), self.progress.hide()))
+            QMessageBox.information(self, "Done", "All selected tracks tagged and renamed successfully!")
+            self.run_scan(force_full=True)
+            
+        w.complete.connect(_on_apply_complete)
         w.error.connect(lambda e: (
             QMessageBox.critical(self, "Apply Error", e),
             self.apply_btn.setEnabled(True),

@@ -194,12 +194,14 @@ class AudioPlayerBar(QWidget):
         layout.setSpacing(6)
 
         self.play_btn = QPushButton("▶")
-        self.play_btn.setFixedWidth(32)
+        self.play_btn.setFixedSize(40, 40)
+        self.play_btn.setStyleSheet("padding: 0px; font-size: 20px;")
         self.play_btn.setToolTip("Play / Pause  (Space)")
         self.play_btn.clicked.connect(self.toggle_play_pause)
 
         self.stop_btn = QPushButton("⏹")
-        self.stop_btn.setFixedWidth(32)
+        self.stop_btn.setFixedSize(40, 40)
+        self.stop_btn.setStyleSheet("padding: 0px; font-size: 20px;")
         self.stop_btn.setToolTip("Stop and close player")
         self.stop_btn.clicked.connect(self.stop)
 

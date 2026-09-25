@@ -186,25 +186,10 @@ class MainWindow(QMainWindow, TaggerTabMixin):
     # ── Settings propagation ──────────────────────────────────────────────────
 
     def _apply_settings(self, cfg: dict):
-        """Called when the user clicks Apply or Save in the Settings tab.
-
-        Updates self.cfg and re-applies the theme immediately.  If a folder
-        is already loaded the table is fully re-scanned so that ALL parsing
-        settings (feat format, transforms, strip_original_mix, naming
-        template, static values, etc.) take effect straight away — exactly
-        the same as pressing ↺ Re-scan.
-        """
+        """Called when the user clicks Apply or Save in the Settings tab."""
         self.cfg = cfg
         self._apply_theme(cfg)
-
-        if self.folder:
-            # Full re-parse with the new settings — this is the only way to
-            # make feat_format / strip_original_mix / transforms apply to the
-            # rows that are already in the table.
-            self.sb.showMessage("Settings saved — re-scanning with new settings…")
-            self.run_scan(force_full=True)
-        else:
-            self.sb.showMessage("Settings saved.")
+        self.sb.showMessage("Settings saved. (Click Re-scan if you want them to apply to loaded files)")
 
     # ── Help tab ──────────────────────────────────────────────────────────────
 

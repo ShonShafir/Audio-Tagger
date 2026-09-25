@@ -46,13 +46,13 @@ class TemplateBuilderWidget(QWidget):
         self.token_list.setDragDropMode(QAbstractItemView.DragDropMode.DragOnly)
         
         # Populate tokens
-        self._add_token("Original File", "{filename_orig}")
-        self._add_token("Proposed Filename", "{filename_current}")
+        
+        
         for f in fields:
             label = f.get("label", f.get("id"))
             fid = f.get("id")
-            self._add_token(f"{label} (Current/Edited)", f"{{{fid}}}")
-            self._add_token(f"{label} (Original/Parsed)", f"{{{fid}_orig}}")
+            self._add_token(label, f"{{{fid}}}")
+            
             
         layout.addWidget(self.token_list)
         
